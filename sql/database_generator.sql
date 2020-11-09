@@ -24,12 +24,13 @@ USE Freebay;
 -- Table creation (x11; excl. FK constraints)
 CREATE TABLE Buyers (
     buyerID INT UNSIGNED AUTO_INCREMENT,  
-    username VARCHAR(20) NOT NULL,  -- Do not check UNIQUE locally - use trigger to check UNIQUE across Buyers & Sellers (see below)
+    username VARCHAR(20) NOT NULL,  
     email VARCHAR(254) NOT NULL,
     pass CHAR(60) NOT NULL,
     firstName VARCHAR(35) NOT NULL,
     familyName VARCHAR(35) NOT NULL,
-    CONSTRAINT Buyers_pk PRIMARY KEY (buyerID)
+    CONSTRAINT Buyers_pk PRIMARY KEY (buyerID),
+    CONSTRAINT Buyers_ck UNIQUE (username)  -- Also check UNIQUE across both Buyers & Sellers using a trigger (see below); done here too for redundancy
     )
     ENGINE = InnoDB;
 
@@ -53,12 +54,13 @@ CREATE TABLE BuyerTels (
 
 CREATE TABLE Sellers (
     sellerID INT UNSIGNED AUTO_INCREMENT,
-    username VARCHAR(20) NOT NULL,  -- Do not check UNIQUE locally - use trigger to check UNIQUE across Buyers & Sellers (see below)
+    username VARCHAR(20) NOT NULL,  
     email VARCHAR(254) NOT NULL,
     pass CHAR(60) NOT NULL,
     firstName VARCHAR(35) NOT NULL,
     familyName VARCHAR(35) NOT NULL,
-    CONSTRAINT Sellers_pk PRIMARY KEY (sellerID)
+    CONSTRAINT Sellers_pk PRIMARY KEY (sellerID),
+    CONSTRAINT Sellers_ck UNIQUE (username)  -- Also check UNIQUE across both Buyers & Sellers using a trigger (see below); done here too for redundancy
     )
     ENGINE = InnoDB;
 
@@ -120,8 +122,7 @@ CREATE TABLE Auctions (
     CONSTRAINT Auctions_pk PRIMARY KEY (auctionID),
     CONSTRAINT CHK_startDate CHECK (startDate >= createDate),         -- Simple validity check
     CONSTRAINT CHK_endDate CHECK (endDate > startDate),               -- Simple validity check
-    CONSTRAINT CHK_reservePrice CHECK (reservePrice >= startPrice),   -- Simple validity check
-    CONSTRAINT CHK_minIncrement CHECK (minIncrement > 0)              -- Simple validity check
+    CONSTRAINT CHK_reservePrice CHECK (reservePrice >= startPrice)    -- Simple validity check
     )
     ENGINE = InnoDB;
 
