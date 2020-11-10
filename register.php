@@ -4,7 +4,7 @@
 <h2 class="my-3">Register new account</h2>
 
 <!-- Create user form -->
-<form id="userDetails" method="POST" action="process_registration.php">
+<form id="userDetails" method="post" action="process_registration.php">
 
   <div class="form-group row">
     <label for="accountType" class="col-sm-2 col-form-label text-right">Register as a:</label>
@@ -24,7 +24,7 @@
   <div class="form-group row">
     <label for="username" class="col-sm-2 col-form-label text-right">Username</label>
 	  <div class="col-sm-10">
-      <input type="text" class="form-control" id="username" placeholder="Enter a username (must be unique)" pattern=".{6,20}" title="Usernames should be between 6 and 20 characters long." required>
+      <input type="text" class="form-control" name="username" id="username" placeholder="Enter a username (6 to 20 characters)" pattern=".{6,20}" title="Usernames should be between 6 and 20 characters long." required>
       <small id="usernameHelp" class="form-text text-muted"><span class="text-danger">* Required</span></small>
 	  </div>
   </div>
@@ -32,7 +32,7 @@
   <div class="form-group row">
     <label for="email" class="col-sm-2 col-form-label text-right">Email</label>
 	  <div class="col-sm-10">
-      <input type="email" class="form-control" id="emailReg" placeholder="Enter your email address" required>
+      <input type="email" class="form-control" name="emailReg" id="emailReg" placeholder="Enter your email address" required>
       <small id="emailHelp" class="form-text text-muted"><span class="text-danger">* Required</span></small>
 	  </div>
   </div> 
@@ -40,7 +40,7 @@
   <div class="form-group row">
     <label for="firstName" class="col-sm-2 col-form-label text-right">First Name</label>
 	  <div class="col-sm-10">
-      <input type="text" class="form-control" id="firstName" placeholder="Enter your first name" pattern=".{,35}" title="Names should be no longer than 35 characters." required>
+      <input type="text" class="form-control" name="firstName" id="firstName" placeholder="Enter your first name" pattern=".{1,35}" title="Names should be no longer than 35 characters." required>
       <small id="firstNameHelp" class="form-text text-muted"><span class="text-danger">* Required</span></small>
 	  </div>
   </div>
@@ -48,7 +48,7 @@
   <div class="form-group row">
     <label for="familyName" class="col-sm-2 col-form-label text-right">Family Name</label>
 	  <div class="col-sm-10">
-      <input type="text" class="form-control" id="familyName" placeholder="Enter your family name" pattern=".{,35}" title="Names should be no longer than 35 characters." required>
+      <input type="text" class="form-control" name="familyName" id="familyName" placeholder="Enter your family name" pattern=".{1,35}" title="Names should be no longer than 35 characters." required>
       <small id="familyNameHelp" class="form-text text-muted"><span class="text-danger">* Required</span></small>
 	  </div>
   </div>
@@ -56,7 +56,7 @@
   <div class="form-group row">
     <label for="password" class="col-sm-2 col-form-label text-right">Password</label>
     <div class="col-sm-10">
-      <input type="password" class="form-control" id="passwordReg" placeholder="Enter a password" pattern=".{6,}" title="Passwords must be at least 6 characters long." required>
+      <input type="password" class="form-control" name="passwordReg" id="passwordReg" placeholder="Enter a password (at least 6 characters)" pattern=".{6,}" title="Passwords must be at least 6 characters long." onkeyup="checkPassword()" required>
       <small id="passwordHelp" class="form-text text-muted"><span class="text-danger">* Required</span></small>
     </div>
   </div>
@@ -64,10 +64,10 @@
   <div class="form-group row">
     <label for="passwordConfirmation" class="col-sm-2 col-form-label text-right">Verify password</label>
     <div class="col-sm-10">
-      <input type="password" class="form-control" id="passwordConfirmation" placeholder="Re-enter your password" required>
-      <small id="passwordConfirmationHelp" class="form-text text-muted"><span class="text-danger">* Required</span></small>
+      <input type="password" class="form-control" id="passwordConfirmation" placeholder="Re-enter your password" onkeyup="checkPassword()" required>
+      <small id="passwordConfirmationHelp" class="form-text text-muted"><span id="passwordConfirmationHelpText" class="text-danger">* Required</span></small>
     </div>
-  </div>
+  </div>  
 
   <div class="form-group row">
     <label for="chooseInputAddress" class="col-sm-2 col-form-label text-right">Add an address?</label>
@@ -85,7 +85,7 @@
     <div class="form-group row">
       <label for="line1" class="col-sm-2 col-form-label text-right">Line 1</label>
       <div class="col-sm-10">
-        <input type="text" class="form-control" id="line1" placeholder="Enter the first line of your address" pattern=".{,35}" title="This should be no longer than 35 characters.">
+        <input type="text" class="form-control" name="line1" id="line1" placeholder="Enter the first line of your address" pattern=".{1,35}" title="This should be no longer than 35 characters.">
         <small id="line1Help" class="form-text text-muted"><span class="text-danger">* Required</span></small>
       </div>
     </div>
@@ -93,7 +93,7 @@
     <div class="form-group row">
       <label for="city" class="col-sm-2 col-form-label text-right">City</label>
       <div class="col-sm-10">
-        <input type="text" class="form-control" id="city" placeholder="Enter your city" pattern=".{,35}" title="This should be no longer than 35 characters.">
+        <input type="text" class="form-control" name="city" id="city" placeholder="Enter your city" pattern=".{1,35}" title="This should be no longer than 35 characters.">
         <small id="cityHelp" class="form-text text-muted"><span class="text-danger">* Required</span></small>
       </div>
     </div>
@@ -101,7 +101,7 @@
     <div class="form-group row">
       <label for="postcode" class="col-sm-2 col-form-label text-right">Postcode / ZIP Code</label>
       <div class="col-sm-10">
-        <input type="text" class="form-control" id="postcode" placeholder="Enter your postcode or ZIP code" pattern=".{,35}" title="This should be no longer than 35 characters.">
+        <input type="text" class="form-control" name="postcode" id="postcode" placeholder="Enter your postcode or ZIP code" pattern=".{1,35}" title="This should be no longer than 35 characters.">
         <small id="postcodeHelp" class="form-text text-muted"><span class="text-danger">* Required</span></small>
       </div>
     </div>
@@ -109,13 +109,28 @@
     <div class="form-group row">
       <label for="country" class="col-sm-2 col-form-label text-right">Country</label>
       <div class="col-sm-10">
-        <select class="form-control" id="country">
-          <option selected>Choose...</option>
-          <option value="fill">Fill me in</option>
-          <option value="with">with options</option>
-          <option value="populated">populated from a database?</option>
-        </select>
-        <small id="countryHelp" class="form-text text-muted"><span class="text-danger">* Required</span></small>
+        <select class="form-control" name="country" id="country">
+          <option selected value="" style="display:none" disabled>Choose a country</option>
+          <?php
+            $connection = mysqli_connect('localhost', 'admin', 'adminpassword', 'Freebay');
+            if (!$connection) {
+              mysqli_close($connection);
+              echo '</select>';
+              echo '<small id="dropdownError" class="form-text text-muted"><span class="text-warning">Error connecting to the database. Please refresh the page.</span></small>';
+              header("Location: browse.php");
+            }
+            else {
+              $query = "SELECT countryName FROM Countries ORDER BY countryName ASC";
+              $result = mysqli_query($connection, $query);
+              while ($row = mysqli_fetch_array($result))
+              {
+                echo "<option>".$row['countryName']."</option>";
+              };
+              echo '</select>';
+              echo '<small id="countryHelp" class="form-text text-muted"><span class="text-danger">* Required</span></small>';
+              mysqli_close($connection);
+           }
+          ?>
       </div>
     </div>
 
@@ -137,7 +152,7 @@
     <div class="form-group row">
       <label for="telephoneNumber" class="col-sm-2 col-form-label text-right">Phone number</label>
       <div class="col-sm-10">
-        <input type="tel" class="form-control" id="telephoneNumber" placeholder="Enter your telephone number" pattern="^\+?\d{9,15}" title="A valid international phone number is between 9 and 15 digits long.">
+        <input type="tel" class="form-control" name="telephoneNumber" id="telephoneNumber" placeholder="Enter your number incl. country code (i.e. +123456789)" pattern="^\+{1}\d{8,15}" title="Your number should begin with a '+' and be between 8 and 15 digits long.">
         <small id="telNoHelp" class="form-text text-muted"><span class="text-danger">* Required</span></small>
       </div>
     </div>
@@ -146,22 +161,47 @@
 
   <br>
   <div class="form-group row">
-    <button type="submit" class="btn btn-primary form-control">Register</button>
+    <button type="submit" class="btn btn-primary form-control" id="submitButton" disabled>Register</button>
   </div>
 
 </form>
 
-<div class="text-center">Already have an account? <a href="" data-toggle="modal" data-target="#loginModal">Login</a></div>
+<div class="text-center">Already have an account? <a href="" data-toggle="modal" data-target="#loginModal">Login</a></div><br>
 
 </div>
 
 <?php include_once("footer.php")?>
 
+<!-- *** JavaScript *** -->
+
+<!-- Script for checking passwords match -->
+
+<script>
+
+function checkPassword() {
+
+  var first_password = $('#passwordReg').val();
+  var second_password = $('#passwordConfirmation').val();
+  var password_info = $('#passwordConfirmationHelpText');
+  var button = $('#submitButton');
+
+  if (first_password !== second_password) {
+    button.prop('disabled', true);
+    password_info.html("* Required... passwords do not match!");
+  } else {
+    button.prop('disabled', false);
+    password_info.html("* Required");
+  }
+}
+
+</script>
+
 <!-- Script for hiding/unhiding optional address fields -->
 
 <script>
-var box = $('#inputAddress'),
-    addressField = $('#addressAttributes');
+
+var box = $('#inputAddress');
+var addressField = $('#addressAttributes');
 
 addressField.hide();
 
@@ -169,18 +209,22 @@ box.on('click', function() {
     if($(this).is(':checked')) {
       addressField.show('fast');
       addressField.find('input').attr('required', true);
+      addressField.find('select').attr('required', true);
     } else {
       addressField.hide('fast');
       addressField.find('input').attr('required', false);
     }
-})
+  }
+)
+
 </script>
 
 <!-- Script for hiding/unhiding optional telephone number fields -->
 
 <script>
-var box = $('#inputTelNo'),
-    telNoField = $('#telNoAttributes');
+
+var box = $('#inputTelNo');
+var telNoField = $('#telNoAttributes');
 
 telNoField.hide();
 
@@ -192,5 +236,7 @@ box.on('click', function() {
       telNoField.hide('fast');
       telNoField.find('input').attr('required', false);
     }
-})
+  }
+)
+
 </script>
