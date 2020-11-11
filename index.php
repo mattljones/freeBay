@@ -50,7 +50,7 @@
                 <div class="input-group">
                     <div class="input-group-prepend">
                         <div class="input-group-text">
-                    <input type="checkbox" value="' . $row['categoryID'] . '" name="checkedCategories[]" ' . $checked . '>
+                    <input type="checkbox" value="' . $row['categoryID'] . '" name="checkedCategories[]" ' . '>
                         </div>
                     </div>
                     <div class="form-control"> ' . $category . '</div>
