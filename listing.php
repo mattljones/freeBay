@@ -2,22 +2,49 @@
 <?php require("utilities.php")?>
 
 <?php
+
   // Get info from the URL:
-  $item_id = $_GET['item_id'];
-
-  // TODO: Use item_id to make a query to the database.
-
-  // DELETEME: For now, using placeholder data.
-  $title = "Placeholder title";
-  $description = "Description blah blah blah";
-  $current_price = 30.50;
-  $num_bids = 1;
-  $end_time = new DateTime('2020-11-02T00:00:00');
-
-  // TODO: Note: Auctions that have ended may pull a different set of data,
-  //       like whether the auction ended in a sale or was cancelled due
-  //       to lack of high-enough bids. Or maybe not.
+  $auction_id = $_GET['auctionID'];
+  //$item_id = 8;
   
+  //Connection parameters
+  $server_name = "localhost";
+  $username = "root";
+  $password = "";
+  $db_name = "freebay";
+  
+  //Create connection
+  $conn = new mysqli($server_name, $username, $password, $db_name);
+  // Check connection
+  if ($conn->connect_error) {
+	die("Connection failed: " . $conn->connect_error);
+  }
+  
+  // Get item description, title, and remaining time
+  $sql_1 = "SELECT title, descript, endDate, startPrice, reservePrice, minIncrement FROM auctions WHERE auctionID = $auction_id ";
+  $result = $conn->query($sql_1)->fetch_row() ?? false;
+  $title = $result[0];
+  $description = $result[1];
+  $end_time = new DateTime($result[2]);
+  $start_price = $result[3];
+  $reserve_price = $result[4];
+  $min_increment = $result[5];
+  
+  //Get current price and number of bids
+  $sql2 = "SELECT max(bidAmount), count(bidID) FROM bids WHERE auctionID = $auction_id ";
+  $result = $conn->query($sql2)->fetch_row() ?? false;
+  $current_price = floatval($result[0]);
+  $num_bids = $result[1];
+  
+  $conn -> close();
+  
+  //Get the min bid amount, which we use later for input validation
+  if ($current_price == 0) {
+	  $min_bid = $start_price;
+  } else {
+	  $min_bid = max($start_price, $current_price) + $min_increment;
+  }
+   
   // Calculate time to auction end:
   $now = new DateTime();
   
@@ -26,11 +53,19 @@
     $time_remaining = ' (in ' . display_time_remaining($time_to_end) . ')';
   }
   
+  // Determine whether the auction has ended
+  if ($now >= $end_time || $current_price == $reserve_price) {
+	  $end_auction = 1;
+  } else {
+	  $end_auction = 0;
+  }
+  
   // TODO: If the user has a session, use it to make a query to the database
   //       to determine if the user is already watching this item.
   //       For now, this is hardcoded.
   $has_session = true;
   $watching = false;
+  
 ?>
 
 
@@ -69,20 +104,28 @@
   <div class="col-sm-4"> <!-- Right col with bidding info -->
 
     <p>
-<?php if ($now > $end_time): ?>
-     This auction ended <?php echo(date_format($end_time, 'j M H:i')) ?>
-     <!-- TODO: Print the result of the auction here? -->
+<?php if ($end_auction == 1 && $current_price >= $start_price): ?>
+     <b>This auction ended on <?php echo(date_format($end_time, 'j M H:i')) ?></b><br> <!--$end_time needs to be changed to either end_time or last bid time-->
+	 <b>Auction outcome: <?php echo("Sold for £" . number_format($current_price, 2)) ?></b>
+
+<?php elseif ($end_auction == 1 && $current_price < $start_price): ?>
+	 <b>This auction ended on <?php echo(date_format($end_time, 'j M H:i')) ?></b><br>
+	 <b>Auction outcome: <?php echo("The item was not sold") ?></b>
+	 
 <?php else: ?>
      Auction ends <?php echo(date_format($end_time, 'j M H:i') . $time_remaining) ?></p>  
-    <p class="lead">Current bid: £<?php echo(number_format($current_price, 2)) ?></p>
+    <p class="lead">Starting price: £<?php echo(number_format($start_price, 2)) ?></p>
+	<p class="lead">Current bid: £<?php echo(number_format($current_price, 2)) ?></p>
+	<p class="lead">Minimum increment: £<?php echo(number_format($min_increment, 2)) ?></p>
+	<p class="lead">Reserve price: £<?php echo(number_format($reserve_price, 2)) ?></p>
 
     <!-- Bidding form -->
-    <form method="POST" action="place_bid.php">
+    <form method="POST" action="place_bid.php?auctionID=<?php echo $auction_id ?>" >
       <div class="input-group">
         <div class="input-group-prepend">
           <span class="input-group-text">£</span>
         </div>
-	    <input type="number" class="form-control" id="bid">
+	    <input type="number" class="form-control" id="bid" name = "bid" min=<?php echo $min_bid; ?> max=<?php echo $reserve_price; ?> step=<?php echo $min_increment; ?> required>
       </div>
       <button type="submit" class="btn btn-primary form-control">Place bid</button>
     </form>
