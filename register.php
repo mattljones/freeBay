@@ -124,7 +124,8 @@
         <select class="form-control" name="country" id="country">
           <option selected value="" style="display:none" disabled>Choose your country</option>
           <?php // Populating country dropdown from freeBay database
-            $connection = mysqli_connect('localhost', 'admin', 'adminpassword', 'Freebay');
+            require_once('private/database_credentials.php');
+            $connection = mysqli_connect(host, username, password, database);
             if (!$connection) {
               echo '</select>';
               echo '<small class="form-text text-muted"><span class="text-warning">Error connecting to the database. Please try refreshing the page (you will lose your form data) or add an address after registration.</span></small>';
@@ -195,7 +196,7 @@ function checkUnique() {
   var username = $('#username').val();
   var outcome = '';
   $.ajax({ 
-    url: "php/chk_username.php", 
+    url: "php/check_username.php", 
     async: false,
     data: {"username": username},
     type: "POST",
@@ -208,9 +209,6 @@ function checkUnique() {
   if (outcome == 'not_unique') {
     alert('The username you entered is already taken.\nPlease enter a different username.');
     return false;
-  }
-  else {
-    return true;
   }
 }
 </script>
