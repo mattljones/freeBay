@@ -28,25 +28,34 @@
         <div class="form-group row">
           <label for="auctionTitle" class="col-sm-2 col-form-label text-right">Title of auction</label>
           <div class="col-sm-10">
-            <input type="text" class="form-control" id="auctionTitle" placeholder="e.g. Black mountain bike">
+            <input type="text" class="form-control" id="auctionTitle" name="title" placeholder="e.g. Black mountain bike" required="required">
             <small id="titleHelp" class="form-text text-muted"><span class="text-danger">* Required.</span> A short description of the item you're selling, which will display in listings.</small>
           </div>
         </div>
         <div class="form-group row">
           <label for="auctionDetails" class="col-sm-2 col-form-label text-right">Details</label>
           <div class="col-sm-10">
-            <textarea class="form-control" id="auctionDetails" rows="4"></textarea>
-            <small id="detailsHelp" class="form-text text-muted">Full details of the listing to help bidders decide if it's what they're looking for.</small>
+            <textarea class="form-control" id="auctionDetails" name="Details" rows="4" required="required"></textarea>
+            <small id="detailsHelp" class="form-text text-muted">* Required. Full details of the listing to help bidders decide if it's what they're looking for.</small>
           </div>
         </div>
         <div class="form-group row">
           <label for="auctionCategory" class="col-sm-2 col-form-label text-right">Category</label>
           <div class="col-sm-10">
-            <select class="form-control" id="auctionCategory">
+            <select class="form-control" id="auctionCategory" name='Category' required="required">
               <option selected>Choose...</option>
-              <option value="fill">Fill me in</option>
-              <option value="with">with options</option>
-              <option value="populated">populated from a database?</option>
+              <option value="Collectables & antiques">Collectables & antiques</option>
+              <option value="Electronics">Electronics</option>
+              <option value="Fashion">Fashion</option>
+              <option value="Home & garden">Home & garden</option>
+              <option value="Jewellery & watches">Jewellery & watches</option>
+              <option value="Motors">Motors</option>
+              <option value="Sporting goods">Sporting goods</option>
+              <option value="Toys & games">Toys & games</option>
+              <option value="Books, comics & magazines">Books, comics & magazines</option>
+              <option value="Health & beauty">Health & beauty</option>
+              <option value="Musical instruments">Musical instruments</option>
+              <option value="Business, office & industrial">Business, office & industrial</option>
             </select>
             <small id="categoryHelp" class="form-text text-muted"><span class="text-danger">* Required.</span> Select a category for this item.</small>
           </div>
@@ -58,7 +67,7 @@
               <div class="input-group-prepend">
                 <span class="input-group-text">£</span>
               </div>
-              <input type="number" class="form-control" id="auctionStartPrice">
+              <input type="number" class="form-control" id="startingPrice" name="startingPrice" required="required">
             </div>
             <small id="startBidHelp" class="form-text text-muted"><span class="text-danger">* Required.</span> Initial bid amount.</small>
           </div>
@@ -70,15 +79,41 @@
               <div class="input-group-prepend">
                 <span class="input-group-text">£</span>
               </div>
-              <input type="number" class="form-control" id="auctionReservePrice">
+              <input type="number" class="form-control" id="auctionReservePrice" name="ReservePrice" required="required">
             </div>
-            <small id="reservePriceHelp" class="form-text text-muted">Optional. Auctions that end below this price will not go through. This value is not displayed in the auction listing.</small>
+            <small id="reservePriceHelp" class="form-text text-muted">* Required. Auctions that end below this price will not go through. This value is not displayed in the auction listing.</small>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="minIncrement" class="col-sm-2 col-form-label text-right">minIncrement</label>
+          <div class="col-sm-10">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">£</span>
+              </div>
+              <input type="number" class="form-control" id="minIncrement" name="minIncrement" required="required">
+            </div>
+            <small id="minIncrementHelp" class="form-text text-muted">* Required.</small>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="auctionCreateDate" class="col-sm-2 col-form-label text-right">Create date</label>
+          <div class="col-sm-10">
+            <input type="datetime-local" class="form-control" id="auctionCreateDate" name="Createdate" required="required">
+            <small id="CreateDateHelp" class="form-text text-muted"><span class="text-danger">* Required.</span> Day for the auction to Create.</small>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="auctionStartDate" class="col-sm-2 col-form-label text-right">Start date</label>
+          <div class="col-sm-10">
+            <input type="datetime-local" class="form-control" id="auctionStartDate" name="Startdate" required="required">
+            <small id="StartDateHelp" class="form-text text-muted"><span class="text-danger">* Required.</span> Day for the auction to Start.</small>
           </div>
         </div>
         <div class="form-group row">
           <label for="auctionEndDate" class="col-sm-2 col-form-label text-right">End date</label>
           <div class="col-sm-10">
-            <input type="datetime-local" class="form-control" id="auctionEndDate">
+            <input type="datetime-local" class="form-control" id="auctionEndDate" name="Enddate" required="required">
             <small id="endDateHelp" class="form-text text-muted"><span class="text-danger">* Required.</span> Day for the auction to end.</small>
           </div>
         </div>
