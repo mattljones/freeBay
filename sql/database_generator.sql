@@ -146,6 +146,7 @@ GRANT SELECT, UPDATE, INSERT, DELETE ON Freebay.Bids TO 'admin'@'localhost';
 GRANT SELECT, UPDATE, INSERT, DELETE ON Freebay.Watching TO 'admin'@'localhost';
 GRANT SELECT, UPDATE, INSERT, DELETE ON Freebay.Auctions TO 'admin'@'localhost';
 GRANT SELECT, UPDATE, INSERT, DELETE ON Freebay.Categories TO 'admin'@'localhost';
+GRANT EXECUTE ON Freebay.* TO 'admin'@'localhost'; -- Granting execution rights on all procedures (for use in PHP) 
 
 
 /*
@@ -297,12 +298,28 @@ INSERT INTO Defaults (buyerID, sellerID, categoryID)
 
 -- Ensuring username is unique across both buyers and sellers (future-proofing for combined accounts)
 DELIMITER $$
+CREATE FUNCTION username_check (
+    username_input VARCHAR(20)
+    )
+    RETURNS VARCHAR(10)
+    BEGIN
+        DECLARE storeVal1 INT UNSIGNED;
+        SELECT 1 INTO storeVal1 FROM (SELECT username FROM Buyers UNION ALL SELECT username FROM Sellers) AS combined WHERE username = username_input;
+        IF storeVal1 != 0 THEN
+            RETURN 'not_unique';
+        ELSE
+            RETURN 'unique';
+        END IF;
+    END $$
+DELIMITER ;
+
+DELIMITER $$
 CREATE TRIGGER CHK_buyer_username_unique 
     BEFORE INSERT ON Buyers FOR EACH ROW
     BEGIN
-        DECLARE storeVal INT UNSIGNED;
-        SELECT COUNT(b.BuyerID) + COUNT(s.sellerID) INTO storeVal FROM Buyers b, Sellers s WHERE b.username = NEW.username OR s.username = NEW.username;
-        IF storeVal > 0 THEN
+        DECLARE storeVal VARCHAR(10);
+        SET storeVal = username_check(NEW.username);
+        IF storeVal = 'not_unique' THEN
             SIGNAL SQLSTATE '45000' 
             SET MESSAGE_TEXT = "Please enter a unique username.";
         END IF;    
@@ -313,9 +330,9 @@ DELIMITER $$
 CREATE TRIGGER CHK_seller_username_unique 
     BEFORE INSERT ON Sellers FOR EACH ROW
     BEGIN
-        DECLARE storeVal INT UNSIGNED;
-        SELECT COUNT(b.BuyerID) + COUNT(s.sellerID) INTO storeVal FROM Buyers b, Sellers s WHERE b.username = NEW.username OR s.username = NEW.username;
-        IF storeVal > 0 THEN
+        DECLARE storeVal VARCHAR(10);
+        SET storeVal = username_check(NEW.username);
+        IF storeVal = 'not_unique' THEN
             SIGNAL SQLSTATE '45000' 
             SET MESSAGE_TEXT = "Please enter a unique username.";
         END IF;    
@@ -328,7 +345,7 @@ CREATE FUNCTION bid_check (
     amount DECIMAL(9,2) UNSIGNED,
     auction BIGINT UNSIGNED
     )
-    RETURNS CHAR(5)
+    RETURNS VARCHAR(7)
     BEGIN
         DECLARE storeVal1 DECIMAL(9,2) UNSIGNED;
         DECLARE storeVal2 DECIMAL(9,2) UNSIGNED;
@@ -336,17 +353,17 @@ CREATE FUNCTION bid_check (
             IF storeVal1 = 0 THEN
                 SELECT startPrice INTO storeVal2 FROM Auctions WHERE auctionID = auction;
                 IF amount >= storeVal2 THEN
-                    RETURN 'Valid';
+                    RETURN 'valid';
                 ELSE
-                    RETURN 'Inval';
+                    RETURN 'invalid';
                 END IF;
             ELSE 
                 SELECT MAX(bidAmount) INTO storeVal1 FROM Bids WHERE auctionID = auction;
                 SELECT minIncrement INTO storeVal2 FROM Auctions WHERE auctionID = auction;
                 IF amount >= (storeVal1 + storeVal2) THEN
-                    RETURN 'Valid';
+                    RETURN 'valid';
                 ELSE
-                    RETURN 'Inval';
+                    RETURN 'invalid';
                 END IF;
             END IF;
     END $$
@@ -356,9 +373,9 @@ DELIMITER $$
 CREATE TRIGGER CHK_bid_valid 
     BEFORE INSERT ON Bids FOR EACH ROW
     BEGIN
-        DECLARE storeVal CHAR(5);
+        DECLARE storeVal VARCHAR(7);
         SET storeVal = bid_check(NEW.bidAmount, NEW.auctionID);
-        IF storeVal = 'Inval' THEN
+        IF storeVal = 'invalid' THEN
             SIGNAL SQLSTATE '45000' 
             SET MESSAGE_TEXT = "Please enter a valid bid amount.";
         END IF;    
