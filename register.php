@@ -1,10 +1,10 @@
-<?php include_once("header.php")?>
+<?php include_once("header.php")?> 
 
 <div class="container">
 <h2 class="my-3">Register a new account</h2>
 
 <!-- Registration form -->
-<form method="POST" action="process_registration.php" onsubmit="return checkUnique()"> <!-- Checks username is unique on submission of form (& blocks submission if it isn't) -->
+<form method="POST" action="process_registration.php" onsubmit="return checkUniqueSubmit()"> <!-- Check username is unique before form submission -->
 
   <!-- Account type -->
   <div class="form-group row">
@@ -26,8 +26,8 @@
   <div class="form-group row">
     <label for="username" class="col-sm-2 col-form-label text-right">Username</label>
 	  <div class="col-sm-10">
-      <input type="text" class="form-control" name="username" id="username" placeholder="Enter a username (6 to 20 characters)" pattern=".{6,20}" title="Usernames should be between 6 and 20 characters long." required>
-      <small class="form-text text-muted"><span class="text-danger">* Required</span></small>
+      <input type="text" class="form-control" name="username" id="username" placeholder="Enter a username (6 to 20 characters)" pattern=".{6,20}" title="Usernames should be between 6 and 20 characters long." onblur="checkUniqueLive()" required> <!-- Check username is unique in real time -->
+      <small class="form-text text-muted"><span class="text-danger" id="usernameHelpText">* Required</span></small>
 	  </div>
   </div>
 
@@ -62,7 +62,7 @@
   <div class="form-group row">
     <label for="passwordReg" class="col-sm-2 col-form-label text-right">Password</label>
     <div class="col-sm-10">
-      <input type="password" class="form-control" name="passwordReg" id="passwordReg" placeholder="Enter a password (at least 6 characters)" pattern=".{6,}" title="Passwords must be at least 6 characters long." onkeyup="checkPassword()" required>
+      <input type="password" class="form-control" name="passwordReg" id="passwordReg" placeholder="Enter a password (at least 6 characters)" pattern=".{6,}" onkeyup="checkPassword()" title="Passwords must be at least 6 characters long." onkeyup="checkPassword()" required>
       <small class="form-text text-muted"><span class="text-danger">* Required</span></small>
     </div>
   </div>
@@ -128,14 +128,14 @@
             $connection = mysqli_connect(host, username, password, database);
             if (!$connection) {
               echo '</select>';
-              echo '<small class="form-text text-muted"><span class="text-warning">Error connecting to the database. Please try refreshing the page (you will lose your form data) or add an address after registration.</span></small>';
+              echo '<small class="form-text text-muted"><span class="bg-warning text-dark">&nbspError connecting to the database. Please try refreshing the page (you will lose your form data) or add an address after registration.&nbsp</span></small>';
             }
             else {
               $query = 'SELECT countryName FROM Countries ORDER BY countryName ASC';
               $result = mysqli_query($connection, $query);
               if (!$result) {
                 echo '</select>';
-                echo '<small class="form-text text-muted"><span class="text-warning">Error collecting country data from the database. Please try refreshing the page (you will lose your form data) or add an address after registration.</span></small>';
+                echo '<small class="form-text text-muted"><span class="bg-warning text-dark">&nbspError collecting country data from the database. Please try refreshing the page (you will lose your form data) or add an address after registration.&nbsp</span></small>';
                 mysqli_close($connection);
               }
               else {
@@ -190,10 +190,12 @@
 
 <!-- *** JavaScript *** -->
 
-<!-- Script (AJAX) for checking username is unique -->
+<!-- Script (AJAX) incl. 2 functions for checking username is unique -->
 <script>
-function checkUnique() { 
+
+function checkUniqueLive() { 
   var username = $('#username').val();
+  var username_info = $('#usernameHelpText');
   var outcome = '';
   $.ajax({ 
     url: "php/check_username.php", 
@@ -201,16 +203,47 @@ function checkUnique() {
     data: {"username": username},
     type: "POST",
     success: function (data) {
-      if (data == 'not_unique') {
+      if (data == 'unique') {
+        outcome = 'unique';
+      }
+      else if (data == 'not_unique') {
         outcome = 'not_unique';
+      }
+      else if (data == 'failure') {
+        outcome = 'failure';
       }
     }
   });
-  if (outcome == 'not_unique') {
-    alert('The username you entered is already taken.\nPlease enter a different username.');
+  if (outcome == 'unique') {
+    username_info.html('* Required &nbsp &nbsp</span><span class="bg-success text-white">&nbspUnique&nbsp</span>');
+    return outcome;
+  }
+  else if (outcome == 'not_unique') {
+    username_info.html('* Required &nbsp &nbsp</span><span class="bg-warning text-dark">&nbspUsername already in use&nbsp</span>');
+    return outcome;
+  }
+  else if (outcome == 'failure') {
+    username_info.html('* Required &nbsp &nbsp</span><span class="bg-warning text-dark">&nbspError connecting to the database. If this issue persists, please refresh the page.&nbsp</span>');
+    return outcome;
+  }
+}
+
+function checkUniqueSubmit() { 
+  var username = $('#username').val();
+  var outcome = checkUniqueLive(username);
+  if (outcome == 'unique') {
+    return true;
+  }
+  else if (outcome == 'not_unique') {
+    alert('That username is already in use.\nPlease pick another.');
+    return false;
+  }
+  else if (outcome == 'failure') {
+    alert('There was an error connecting to the database.\nIf this issue persists, please refresh the page.');
     return false;
   }
 }
+
 </script>
 
 <!-- Script for checking passwords match -->
@@ -220,12 +253,16 @@ function checkPassword() {
   var second_password = $('#passwordConfirmation').val();
   var password_info = $('#passwordConfirmationHelpText');
   var button = $('#submitButton');
-  if (first_password !== second_password) {
+  if (first_password.length < 6 || second_password.length < 6){
+    password_info.html('* Required');
+  }
+  else if (first_password !== second_password) {
     button.prop('disabled', true);
-    password_info.html("* Required... passwords do not match!");
-  } else {
+    password_info.html('* Required &nbsp &nbsp</span><span class="bg-warning text-dark">&nbspPasswords do not match&nbsp</span>');
+  }
+  else {
     button.prop('disabled', false);
-    password_info.html("* Required");
+    password_info.html('* Required &nbsp &nbsp</span><span class="bg-success text-white">&nbspPasswords match&nbsp</span>');
   }
 }
 </script>
