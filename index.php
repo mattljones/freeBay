@@ -40,7 +40,8 @@
     <div class="list-group">
       <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="POST">
         <?php
-        include_once("db_connect.php");
+        require_once('private/database_credentials.php');
+        $conn = mysqli_connect(host, username, password, database) or die("Connection failed: " . mysqli_connect_error());
         $sql = "SELECT categoryName,categoryID From Categories";
         $result = mysqli_query($conn, $sql) or die("database error:" . mysqli_error($conn));
         $row = mysqli_fetch_array($result, MYSQLI_NUM);
