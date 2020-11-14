@@ -52,8 +52,10 @@
             $checked = "";
             $categoryName = $row['categoryName'];
             $categoryID = $row['categoryID'];
-            if (in_array($categoryID, $_POST['checkedCategories'])) {
-              $checked = "checked";
+            if (isset($_POST['checkedCategories'])) {
+              if (in_array($categoryID, $_POST['checkedCategories'])) {
+                $checked = "checked";
+              }
             }
             echo '
                   <div class="input-group">
