@@ -3,7 +3,7 @@
 
 <div class="container">
 
-<h2 class="my-3">My bids</h2>
+<h2 class="my-3">My Bids</h2>
 
 <?php
   // This page is for showing a user the auctions they've bid on.

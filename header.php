@@ -1,16 +1,7 @@
-<?php
-  // FIXME: At the moment, I've allowed these values to be set manually.
-  // But eventually, with a database, these should be set automatically
-  // ONLY after the user's login credentials have been verified via a 
-  // database query.
-  session_start();
-  $_SESSION['logged_in'] = false;
-  $_SESSION['account_type'] = 'seller';
-?>
-
-
 <!doctype html>
+
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -23,7 +14,11 @@
   <!-- Custom CSS file -->
   <link rel="stylesheet" href="css/custom.css">
 
+  <link rel="icon" href="assets/favicon.png" type="image/x-icon"/>
   <title>freeBay</title>
+
+  <?php session_start(); ?> <!-- Accessing session variables -->
+
 </head>
 
 
@@ -39,35 +34,57 @@
   // Displays either login or logout on the right, depending on user's
   // current status (session).
   if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
-    echo '<a class="nav-link" href="logout.php"><b>Logout</b></a>';
+    echo '<a class="nav-link text-info" href="logout.php"><b>Logout</b></a>';
   }
   else {
-    echo '<button type="button" class="btn nav-link" data-toggle="modal" data-target="#loginModal"><b>Login</b></button>';
+    echo '<button type="button" class="btn nav-link text-success" data-toggle="modal" data-target="#loginModal"><b>Login</b></button>';
+    echo '<a class="nav-link" href="register.php"><i>Register</i></a>';
   }
 ?>
-
     </li>
   </ul>
 </nav>
+
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
   <ul class="navbar-nav align-middle">
-	<li class="nav-item mx-1">
+<?php
+  if (!isset($_SESSION['account_type'])) {
+  echo('
+  <li class="nav-item mx-1">
+      <a class="nav-link" href="browse.php">Browse</a>
+    </li>');
+  }
+  elseif (isset($_SESSION['account_type']) && $_SESSION['account_type'] == 'buyer') {
+  echo('
+  <li class="nav-item mx-1">
+      <a class="nav-link text-white"><b>Logged in as:</b><i>&nbsp&nbsp'.$_SESSION['username'].'</i></a>
+    </li>
+  <li class="nav-item mx-1">
       <a class="nav-link" href="browse.php">Browse</a>
     </li>
-<?php
-  if (isset($_SESSION['account_type']) && $_SESSION['account_type'] == 'buyer') {
-  echo('
-	<li class="nav-item mx-1">
+  <li class="nav-item mx-1">
       <a class="nav-link" href="mybids.php">My Bids</a>
+    </li>
+  <li class="nav-item mx-1">
+      <a class="nav-link" href="mywatchlist.php">My Watchlist</a>
     </li>
 	<li class="nav-item mx-1">
       <a class="nav-link" href="recommendations.php">Recommended</a>
     </li>');
   }
-  if (isset($_SESSION['account_type']) && $_SESSION['account_type'] == 'seller') {
+  elseif (isset($_SESSION['account_type']) && $_SESSION['account_type'] == 'seller') {
   echo('
+  <li class="nav-item mx-1">
+      <a class="nav-link text-white"><b>Logged in as:</b><i>&nbsp&nbsp'.$_SESSION['username'].'</i></a>
+    </li>
+  <li class="nav-item mx-1">
+      <a class="nav-link" href="browse.php">Browse</a>
+    </li>
 	<li class="nav-item mx-1">
       <a class="nav-link" href="mylistings.php">My Listings</a>
+    </li>
+  <li class="nav-item mx-1">
+      <a class="nav-link" href="mywatchlist.php">My Watchlist</a>
     </li>
 	<li class="nav-item ml-3">
       <a class="nav-link btn border-light" href="create_auction.php">+ Create auction</a>
@@ -91,16 +108,15 @@
       <div class="modal-body">
         <form method="POST" action="login_result.php">
           <div class="form-group">
-            <label for="email">Email</label>
-            <input type="text" class="form-control" id="email" placeholder="Email">
+            <label for="user_name">Username</label>
+            <input type="text" class="form-control" id="user_name" name="user_name" placeholder="Username">
           </div>
           <div class="form-group">
             <label for="password">Password</label>
-            <input type="password" class="form-control" id="password" placeholder="Password">
+            <input type="password" class="form-control" id="password" name="password" placeholder="Password">
           </div>
           <button type="submit" class="btn btn-primary form-control">Sign in</button>
         </form>
-        <div class="text-center">or <a href="register.php">create an account</a></div>
       </div>
 
     </div>
