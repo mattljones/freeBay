@@ -3,14 +3,9 @@
 
 <?php
 
-  //Connection parameters
-  $server_name = "localhost";
-  $username = "root";
-  $password = "";
-  $db_name = "freebay";
-  
   //Create connection
-  $conn = new mysqli($server_name, $username, $password, $db_name);
+  require_once('private/database_credentials.php');
+  $conn = mysqli_connect(host, username, password, database);
   // Check connection
   if ($conn->connect_error) {
 	die("Connection failed: " . $conn->connect_error);
@@ -20,10 +15,9 @@
   $now = new DateTime();
   $bid_date = $now->format("Y-m-d H:i:s");
   $bid_amount = $_POST['bid'];
-  //TODO: get the actual buyer ID
-  $buyer_id = 2;
   $auction_id = $_GET['auctionID'];
-  
+  $buyer_id = $_SESSION['userID'];
+
   //Insert the records into the database
   $sql = "INSERT INTO bids (bidDate, bidAmount, buyerID, auctionID) VALUES ('$bid_date', '$bid_amount', '$buyer_id', '$auction_id')";
   
@@ -54,8 +48,8 @@
 <div class="row"> <!-- Row #2 with auction description + bidding info -->
   <div class="col-sm-8"> <!-- Left col with item info -->
 
-    <div class="goBack">
-    <?php echo("Go back to listing."); ?> <!--TODO: add link to go back to the auction -->
+    <div class="goBack"> 
+		<a href="listing.php?auctionID=<?php echo($auction_id) ?>"> Go back to listing.</a>
     </div>
 
   </div>
