@@ -4,7 +4,8 @@
 
 //header("Location: browse.php");
 ?>
-<?php include_once("header.php") ?>
+<?php include_once("header.php"); ?>
+<?php require("utilities.php");?>
 <hr>
 
 <div class="col-md-10 col-lg-8 col-xl-7 mx-auto">
@@ -91,10 +92,16 @@
       }
       $resultset = mysqli_query($conn, $sql) or die("database error:" . mysqli_error($conn));
       while ($record = mysqli_fetch_assoc($resultset)) {
-        $datetime1 = new DateTime($record['endDate']);
-        $datetime2 = new DateTime();
+        $end_time = new DateTime($record['endDate']);
+        $now = new DateTime();
         $productID = $record['auctionID'];
-        $productTimeLeft = $datetime1->diff($datetime2);
+        if ($now < $end_time) {
+          $time_to_end = date_diff($now, $end_time);
+          $productTimeLeft = ' (in ' . display_time_remaining($time_to_end) . ')';
+        }
+        else {
+          $productTimeLeft = "Auction Ended";
+        }
         $productTitle = $record['title'];
         $productCategory = $record['categoryName'];
         $productDescript = $record['descript'];
@@ -107,7 +114,7 @@
             <h5 class="card-title"><?php echo $productTitle ?></h5>
             <p class="card-text">Category: <?php echo $productCategory ?></p>
             <p class="card-text"><?php echo $productDescript ?><br> Price: <?php echo $productPrice ?></p>
-            <p class="card-text">Time Remaining: <br> <?php echo $productTimeLeft->format("%a day(s) %h hr %i min") ?></p>
+            <p class="card-text">Time Remaining: <br> <?php echo $productTimeLeft?></p>
             <!-- <a href="listing.php?auctionID=<?= $productID ?>" type="submit" class="btn btn-outline-primary text-center">View Item</a> -->
           </div>
           <div class="card-footer">
