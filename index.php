@@ -92,12 +92,21 @@
       }
       $resultset = mysqli_query($conn, $sql) or die("database error:" . mysqli_error($conn));
       while ($record = mysqli_fetch_assoc($resultset)) {
+        $productAuctionID = $record['auctionID'];;
+        $sql2 = "SELECT max(bidAmount) as currentPrice, count(bidID) FROM Bids WHERE auctionID = $productAuctionID ";
+        $sql3 = "SELECT count(auctionID) as noOfWatchers FROM Watching WHERE auctionID = $productAuctionID ";
+        $result = $conn->query($sql2)->fetch_assoc() ?? false;
+        $result3 = $conn->query($sql3)->fetch_assoc() ?? false;
+        $productCurrentPrice = $result['currentPrice'];
+        #print($productCurrentPrice);
+        #print_r($result);
+        #$recordBids = mysqli_fetch_assoc($result);
         $end_time = new DateTime($record['endDate']);
         $now = new DateTime();
         $productID = $record['auctionID'];
         if ($now < $end_time) {
           $time_to_end = date_diff($now, $end_time);
-          $productTimeLeft = ' (in ' . display_time_remaining($time_to_end) . ')';
+          $productTimeLeft = ' Auction will end in ' . display_time_remaining($time_to_end) . '';
         }
         else {
           $productTimeLeft = "Auction Ended";
@@ -105,7 +114,14 @@
         $productTitle = $record['title'];
         $productCategory = $record['categoryName'];
         $productDescript = $record['descript'];
-        $productPrice = $record['startPrice']
+        $productStartPrice = $record['startPrice'];
+        $productReservePrice = $record['reservePrice'];
+        $productBidders = $result['count(bidID)'];
+        $productWatchers = $result3['noOfWatchers'];
+
+        if ($productCurrentPrice == false) {
+          $productCurrentPrice = $productStartPrice;
+        }
 
       ?>
         <div class="card" style="width: 18rem;">
@@ -113,14 +129,16 @@
           <div class="card-body">
             <h5 class="card-title"><?php echo $productTitle ?></h5>
             <p class="card-text">Category: <?php echo $productCategory ?></p>
-            <p class="card-text"><?php echo $productDescript ?><br> Price: <?php echo $productPrice ?></p>
-            <p class="card-text">Time Remaining: <br> <?php echo $productTimeLeft?></p>
+            <p class="card-text">No of Bidders: <?php echo $productBidders ?></p>
+            <p class="card-text">No of Watchers: <?php echo $productWatchers ?></p>
+            <p class="card-text"><?php echo $productDescript ?><br> Start Price: <?php echo $productStartPrice ?></p>
+            <p class="card-text"><?php echo $productTimeLeft?></p>
             <!-- <a href="listing.php?auctionID=<?= $productID ?>" type="submit" class="btn btn-outline-primary text-center">View Item</a> -->
           </div>
           <div class="card-footer">
             <div class="buy d-flex justify-content-between align-items-center">
               <div class="price text-success">
-                <h5 class="mt-4">£<?= $productPrice ?></h5>
+                <h5 class="mt-4">£<?= $productCurrentPrice ?></h5>
               </div>
               <a href="listing.php?auctionID=<?= $productID ?>" type="submit" class="btn btn-outline-primary text-center">View Item</a>
               <!--<a href="#" class="btn btn-danger mt-3"><i class="fas fa-shopping-cart"></i> View Item</a>-->
