@@ -38,28 +38,38 @@
     <h1>Categories</h1>
     <hr>
     <div class="list-group">
-      <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="POST">
-        <?php
-        require_once('private/database_credentials.php');
-        $conn = mysqli_connect(host, username, password, database) or die("Connection failed: " . mysqli_connect_error());
-        $sql = "SELECT categoryName,categoryID From Categories";
-        $result = mysqli_query($conn, $sql) or die("database error:" . mysqli_error($conn));
-        $row = mysqli_fetch_array($result, MYSQLI_NUM);
-        while ($row = mysqli_fetch_array($result)) {
-          $category = $row['categoryName'];
-          echo '
-                <div class="input-group">
-                    <div class="input-group-prepend">
-                        <div class="input-group-text">
-                    <input type="checkbox" value="' . $row['categoryID'] . '" name="checkedCategories[]" ' . '>
-                        </div>
-                    </div>
-                    <div class="form-control"> ' . $category . '</div>
-                </div>';
-        }
-        ?>
-        <button type="submit" class="btn btn-outline-primary" style="margin-top: 5%;">Apply</button>
-      </form>
+      <div id="categories-filter">
+        <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="POST">
+          <?php
+          require_once('private/database_credentials.php');
+          $conn = mysqli_connect(host, username, password, database) or die("Connection failed: " . mysqli_connect_error());
+          $sql = "SELECT categoryName,categoryID From Categories";
+          $result = mysqli_query($conn, $sql) or die("database error:" . mysqli_error($conn));
+          $row = mysqli_fetch_array($result, MYSQLI_NUM);
+          $counter = 0;
+          while ($row = mysqli_fetch_array($result)) {
+            $checked = "";
+            $categoryName = $row['categoryName'];
+            $categoryID = $row['categoryID'];
+            if (in_array($categoryID, $_POST['checkedCategories'])) {
+              $checked = "checked";
+            }
+            echo '
+                  <div class="input-group">
+                      <div class="input-group-prepend">
+                          <div class="input-group-text">
+                            <input type="checkbox" value="' . $categoryID . '" name="checkedCategories[]" ' . $checked . '>
+                          </div>
+                      </div>
+                    <div class="form-control"> ' . $categoryName . '</div>
+                  </div>';
+            $counter++;
+          }
+          ?>
+          <button type="submit" class="btn btn-outline-primary" style="margin-top: 5%;">Apply</button>
+        </form>
+        <button id="checkAll" class="btn btn-outline-primary" style="margin-top: 5%;">Reset filters</button>
+      </div>
     </div>
 
 
@@ -116,6 +126,14 @@
   </body>
 
   <script>
+    function uncheckAll() {
+      $("input[type='checkbox']:checked").prop("checked", false)
+      <?php 
+        $_POST['checkedCategories'] = array();
+      ?>
+    }
+    $('#checkAll').on('click', uncheckAll)
+
     $(document).ready(function() {
       $('#searchbox').on("keyup", function() {
         var value = $(this).val().toLowerCase();
