@@ -11,7 +11,9 @@ include_once("header.php")?>
 /* TODO #1: Connect to MySQL database (perhaps by requiring a file that
             already does this). */
 
-$conn = mysqli_connect("localhost","root","root","freebay") or die ('Error connecting to MySQL server.' . mysql_error());
+            require_once('private/database_credentials.php');
+            
+            $conn = mysqli_connect(host, username, password, database)or die ('Error connecting to MySQL server.' . mysql_error());
 
 
 /* TODO #2: Extract form data into variables. Because the form was a 'post'
@@ -30,33 +32,56 @@ $startingPrice=$_POST['startingPrice'];
 
 $reservePrice=$_POST['ReservePrice'];
 $minIncrement=$_POST['minIncrement'];
-$createDate=$_POST['Createdate'];
+$createDate=date("Y-m-d H:i:s");
 $startDate=$_POST['Startdate'];
 $endDate=$_POST['Enddate'];
 
 //need username to replace this default value
-$seller='rulesuper';
+$seller='rulesuper';// $_SESSION['account_type'] replace the 'rulesuper'
 
 
 // /* TODO #3: If everything looks good, make the appropriate call to insert
 //             data into the database. */
             
 
+if(empty($_POST['ReservePrice'])){ 
+  $reservePrice = $startingPrice;
+}else{
+  $reservePrice=$_POST['ReservePrice'];
+}
+
+if(empty($_POST['minIncrement'])){
+  $minIncrement=0.01;
+}else{
+  $minIncrement=$_POST['minIncrement'];
+}
+
+if(empty($_POST['Startdate'])){
+  $startDate=date("Y-m-d H:i:s");
+}else{
+  $startDate=$_POST['Startdate'];
+}
+
+
+
+
+
 if(!$title ||!$descript || !$category || !$startingPrice   || !$reservePrice  || !$minIncrement  || !$createDate || !$startDate || !$endDate){
     echo('Error:There is lack of some data');
     exit;
 }
 
-if($startingPrice < 0 or $reservePrice <0 or $minIncrement < 0){
-    echo('Error:Please enter correct price');
-    exit;
-}
 
-if(strtotime($startDate)>strtotime($endDate)){
-  
-	echo('Error:Please enter correct startDate,startdate should be later to endDate');
-    exit;
- }
+
+
+
+
+
+
+
+
+
+
 
 $query1 = "SELECT categoryID FROM Categories WHERE categoryName = '$category'";
 $result1 = mysqli_query($conn,$query1);

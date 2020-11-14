@@ -1,4 +1,5 @@
-<?php include_once("header.php")?>
+<?php 
+include_once("header.php")?>
 
 <?php
 /* (Uncomment this block to redirect people without selling privileges away from this page)
@@ -24,7 +25,7 @@
       before they try to send it, but that kind of functionality should be
       extremely low-priority / only done after all database functions are
       complete. -->
-      <form method="post" action="create_auction_result.php">
+      <form method="post" action="create_auction_result.php" onsubmit="return modifysubmit();">
         <div class="form-group row">
           <label for="auctionTitle" class="col-sm-2 col-form-label text-right">Title of auction</label>
           <div class="col-sm-10">
@@ -36,7 +37,7 @@
           <label for="auctionDetails" class="col-sm-2 col-form-label text-right">Details</label>
           <div class="col-sm-10">
             <textarea class="form-control" id="auctionDetails" name="Details" rows="4" required="required"></textarea>
-            <small id="detailsHelp" class="form-text text-muted">* Required. Full details of the listing to help bidders decide if it's what they're looking for.</small>
+            <small id="detailsHelp" class="form-text text-muted"><span class="text-danger">* Required.</span>Full details of the listing to help bidders decide if it's what they're looking for.</small>
           </div>
         </div>
         <div class="form-group row">
@@ -79,41 +80,37 @@
               <div class="input-group-prepend">
                 <span class="input-group-text">£</span>
               </div>
-              <input type="number" class="form-control" id="auctionReservePrice" name="ReservePrice" required="required">
+              <input type="number" class="form-control" id="ReservePrice" name="ReservePrice">
             </div>
-            <small id="reservePriceHelp" class="form-text text-muted">* Required. Auctions that end below this price will not go through. This value is not displayed in the auction listing.</small>
+            <small id="reservePriceHelp" class="form-text text-muted">Optional. Auctions that end below this price will not go through. This value is not displayed in the auction listing.</small>
           </div>
         </div>
         <div class="form-group row">
-          <label for="minIncrement" class="col-sm-2 col-form-label text-right">minIncrement</label>
+          <label for="minIncrement" class="col-sm-2 col-form-label text-right">Minimum increment</label>
           <div class="col-sm-10">
             <div class="input-group">
               <div class="input-group-prepend">
                 <span class="input-group-text">£</span>
               </div>
-              <input type="number" class="form-control" id="minIncrement" name="minIncrement" required="required">
+              <input type="number" class="form-control" id="minIncrement" name="minIncrement" onblur="minInput_onblur();">
             </div>
-            <small id="minIncrementHelp" class="form-text text-muted">* Required.</small>
-          </div>
-        </div>
-        <div class="form-group row">
-          <label for="auctionCreateDate" class="col-sm-2 col-form-label text-right">Create date</label>
-          <div class="col-sm-10">
-            <input type="datetime-local" class="form-control" id="auctionCreateDate" name="Createdate" required="required">
-            <small id="CreateDateHelp" class="form-text text-muted"><span class="text-danger">* Required.</span> Day for the auction to Create.</small>
+            <small id="minIncrementHelp" class="form-text text-muted">Optional.</small>
           </div>
         </div>
         <div class="form-group row">
           <label for="auctionStartDate" class="col-sm-2 col-form-label text-right">Start date</label>
           <div class="col-sm-10">
-            <input type="datetime-local" class="form-control" id="auctionStartDate" name="Startdate" required="required">
-            <small id="StartDateHelp" class="form-text text-muted"><span class="text-danger">* Required.</span> Day for the auction to Start.</small>
+            <!-- <input type="datetime-local" class="form-control" id="Startdate" name="Startdate"  value="
+              =(date('Y-m-d')."T".date('H:i'))
+              "> -->
+            <input type="datetime-local" class="form-control" id="Startdate" name="Startdate"  />
+            <small id="StartDateHelp" class="form-text text-muted">Optional. Day for the auction to Start.</small>
           </div>
         </div>
         <div class="form-group row">
           <label for="auctionEndDate" class="col-sm-2 col-form-label text-right">End date</label>
           <div class="col-sm-10">
-            <input type="datetime-local" class="form-control" id="auctionEndDate" name="Enddate" required="required">
+            <input type="datetime-local" class="form-control" id="Enddate" name="Enddate" required="required">
             <small id="endDateHelp" class="form-text text-muted"><span class="text-danger">* Required.</span> Day for the auction to end.</small>
           </div>
         </div>
@@ -127,3 +124,100 @@
 
 
 <?php include_once("footer.php")?>
+
+<script>
+ document.getElementById('Startdate').value=getDT();
+ console.log(getDT());
+
+function getDT(){
+    var myDate=new Date();
+  var year=myDate.getFullYear();
+  var month= myDate.getMonth()+1;       
+  var d= myDate.getDate();
+  var h=myDate.getHours(); 
+  var m=myDate.getMinutes(); 
+  return year+"-"+month+"-"+d+"T"+h+":"+m;
+}
+
+  
+
+function modifysubmit(){
+    var myDate = new Date();
+
+    var d3=myDate.toLocaleString();
+   
+    var Startdate= document.getElementById("Startdate").value;
+    var Enddate= document.getElementById("Enddate").value;
+   var startPrice= parseInt(document.getElementById("startingPrice").value);
+   var reservePrice= parseInt(document.getElementById("ReservePrice").value);
+   var minIncrement= parseInt(document.getElementById("minIncrement").value);
+    
+    var tempDate1=Date.parse(Startdate);
+    var tempDate2=Date.parse(Enddate);
+
+    var tempNowDate=Date.parse(getDT());
+    
+   if(0>= startPrice){
+      document.getElementById("startBidHelp").innerHTML="<font color ='red'>Please enter valid value</font>";
+      return false;
+   }else{
+     document.getElementById("startBidHelp").innerHTML="";
+   }
+   if(0>= reservePrice){
+      document.getElementById("reservePriceHelp").innerHTML="<font color ='red'>Please enter valid value</font>";
+      return false;
+   }else{
+     document.getElementById("reservePriceHelp").innerHTML="";
+   }
+
+   if(0>= minIncrement){
+      document.getElementById("minIncrementHelp").innerHTML="<font color ='red'>Please enter valid value</font>";
+      return false;
+   }else{
+     document.getElementById("minIncrementHelp").innerHTML="";
+   }
+ if(tempDate1<tempNowDate){
+      console.log('err2');
+      document.getElementById("StartDateHelp").innerHTML="<font color ='red'>Please enter valid date</font>";
+      return false;
+   }else{
+      document.getElementById("StartDateHelp").innerHTML="";
+   }
+
+   if(tempDate1>= tempDate2){
+      console.log('err3');
+      document.getElementById("endDateHelp").innerHTML="<font color ='red'>Please enter valid value</font>";
+      return false;
+   }else{
+      document.getElementById("endDateHelp").innerHTML="";
+   }
+
+
+  return true;
+}
+
+function minInput_onblur(){
+   var startingPrice=0;
+   if(document.getElementById("startingPrice").value!='')
+   {
+      startingPrice= parseInt(document.getElementById("startingPrice").value);
+   }
+   var ReservePrice=0;
+   if(document.getElementById("ReservePrice").value!='')
+   {
+      ReservePrice= parseInt(document.getElementById("ReservePrice").value);
+   }
+   var minIncrement=0;
+   if(document.getElementById("minIncrement").value!='')
+   {
+      minIncrement= parseInt(document.getElementById("minIncrement").value);
+   }
+  
+   console.log(startingPrice);
+   if((ReservePrice-startingPrice)<minIncrement)
+   {
+     document.getElementById("minIncrement").value=0.01;
+   }
+}
+
+ </script>
