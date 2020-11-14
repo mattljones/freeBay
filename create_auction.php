@@ -169,7 +169,12 @@ function modifysubmit(){
    }else{
      document.getElementById("reservePriceHelp").innerHTML="";
    }
-
+   if(startPrice>reservePrice){
+      document.getElementById("reservePriceHelp").innerHTML="<font color ='red'>Please enter valid value</font>";
+      return false;
+   }else{
+     document.getElementById("reservePriceHelp").innerHTML="";
+   }
    if(0>= minIncrement){
       document.getElementById("minIncrementHelp").innerHTML="<font color ='red'>Please enter valid value</font>";
       return false;
@@ -216,7 +221,7 @@ function minInput_onblur(){
    console.log(startingPrice);
    if((ReservePrice-startingPrice)<minIncrement)
    {
-     document.getElementById("minIncrement").value=0.01;
+     document.getElementById("minIncrementHelp").innerHTML="<font color ='coral'>Maybe too high</font>";
    }
 }
 
