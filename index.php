@@ -82,7 +82,6 @@
     <hr>
     <div id="productCards" class="row">
       <?php
-      include_once("db_connect.php");
       $sql = "SELECT * FROM Auctions JOIN Categories ON Auctions.categoryID = Categories.categoryID";
       if (isset($_POST['checkedCategories'])) {
         $sql .= " WHERE Categories.`categoryID` IN (";
