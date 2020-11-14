@@ -10,7 +10,7 @@ $connection = mysqli_connect(host, username, password, database);
 if (!$connection) {
     echo '<h2 class="my-3">Login unsuccessful :(</h2>';
     echo '<p>There was an error connecting to the database. Please try again.</p>';
-    die();
+    // Don't include die() as we still need to include the footer's login modal functionality
 }
 
 // Contains functions for validating user-inputted form data and preventing SQL injection attacks
@@ -26,7 +26,6 @@ if (!$result_creds) {
     echo '<h2 class="my-3">Login unsuccessful :(</h2>';
     echo '<p>There was an error connecting to the database. Please try again.</p>';
     mysqli_close($connection);
-    die();
 }
 elseif (password_verify($password, mysqli_fetch_array($result_creds)[0])) {
     $creds_OK = true;
@@ -42,7 +41,6 @@ if (!$result_id) {
     echo '<h2 class="my-3">Login unsuccessful :(</h2>';
     echo '<p>There was an error connecting to the database. Please try again.</p>';
     mysqli_close($connection);
-    die();
 }
 else {
     $userID = mysqli_fetch_array($result_id)[0];
@@ -57,7 +55,6 @@ if (!$result_buyer || !$result_seller) {
     echo '<h2 class="my-3">Login unsuccessful :(</h2>';
     echo '<p>There was an error connecting to the database. Please try again.</p>';
     mysqli_close($connection);
-    die();
 }
 elseif (mysqli_fetch_array($result_buyer)[0] == '1') {
     $type = 'buyer';
@@ -68,20 +65,21 @@ else {
 
 // STEP 4 - Create session if steps 1-3 successful (script will have been exited automatically) and credentials are valid
 if ($creds_OK == true) {
-    header("refresh:5; url=browse.php");
+    header("refresh:5; url=index.php");
     $_SESSION['logged_in'] = true;
     $_SESSION['username'] = $_POST['user_name'];
     $_SESSION['account_type'] = $type;
     $_SESSION['userID'] = $userID;
     echo '<h2 class="my-3">Login successful!</h2>';
     echo '<p><i>You will be redirected shortly.</i></p>';
+    mysqli_close($connection);
     die();
 }
 else {
     echo '<h2 class="my-3">Login unsuccessful :(</h2>';
     echo mysqli_fetch_array($result_creds)[0];
     echo '<p>That username-password combination is invalid. Please try again.</p>';
-    die();
+    mysqli_close($connection);
 }
 
 ?>

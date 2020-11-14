@@ -10,7 +10,7 @@ $connection = mysqli_connect(host, username, password, database);
 if (!$connection) {
     echo '<h2 class="my-3">Registration unsuccessful :(</h2>';
     echo '<p>There was an error connecting to the database.</p><p>Click <a href="register.php">here</a> to return to the registration page and try again.</p>';
-    die();
+    // Don't call die() since we still need to include the footer for login modal functionality
 }
 
 // Contains functions for validating user-inputted form data and preventing SQL injection attacks
@@ -33,7 +33,6 @@ if ($type == "buyer") {
     if (!$result_req) {
         echo '<h2 class="my-3">Registration unsuccessful :(</h2><p>There was an error adding your details to the database.</p><p>Click <a href="register.php">here</a> to return to the registration page and try again.</p>';
         mysqli_close($connection);
-        die();
     }  // Query B.2 - inserting address fields (if chosen)
     if (isset($_POST["chooseInputAddress"])) {
         $line1 = validate_names_addresses($connection, $_POST["line1"]);
@@ -51,7 +50,6 @@ if ($type == "buyer") {
             echo '<h2 class="my-3">Registration unsuccessful :(</h2><p>There was an error adding your details to the database.</p><p>Click <a href="register.php">here</a> to return to the registration page and try again.</p>';
             mysqli_query($connection, "DELETE FROM Buyers WHERE username = '".$username."'");
             mysqli_close($connection);
-            die();
         }
     }  // Query B.3 - inserting telephone fields (if chosen)
     if (isset($_POST["chooseInputTelNo"])) {
@@ -67,18 +65,18 @@ if ($type == "buyer") {
                 mysqli_query($connection, "DELETE FROM BuyerAddresses WHERE buyerID = (SELECT buyerID FROM Buyers WHERE username = '".$username."'");
             }
             mysqli_close($connection);
-            die();
         }
     }
     // Success message & re-direct
     echo '<h2 class="my-3">Registration successful!</h2>';
     echo '<p>Welcome to freeBay.</p>';
     echo '<p><i>You have been logged in automatically, and will be redirected shortly.</i></p>';
-    header("refresh:5; url=browse.php");
+    header("refresh:5; url=index.php");
     $_SESSION['logged_in'] = true;
     $_SESSION['username'] = $_POST['username'];
     $_SESSION['account_type'] = $type;
-    $_SESSION['userID'] = mysqli_insert_id($connection);      
+    $_SESSION['userID'] = mysqli_insert_id($connection);
+    mysqli_close($connection);      
     die();
 }
 
@@ -90,7 +88,6 @@ if ($type == "seller") {
     if (!$result_req) {
         echo '<h2 class="my-3">Registration unsuccessful :(</h2><p>There was an error adding your details to the database.</p><p>Click <a href="register.php">here</a> to return to the registration page and try again.</p>';
         mysqli_close($connection);
-        die();
     }  // Query S.2 - inserting address fields (if chosen)
     if (isset($_POST["chooseInputAddress"])) {
         $line1 = validate_names_addresses($connection, $_POST["line1"]);
@@ -108,7 +105,6 @@ if ($type == "seller") {
             echo '<h2 class="my-3">Registration unsuccessful :(</h2><p>There was an error adding your details to the database.</p><p>Click <a href="register.php">here</a> to return to the registration page and try again.</p>';
             mysqli_query($connection, "DELETE FROM Sellers WHERE username = '".$username."'");
             mysqli_close($connection);
-            die();
         }
     }  // Query S.3 - inserting telephone fields (if chosen)
     if (isset($_POST["chooseInputTelNo"])) {
@@ -124,18 +120,18 @@ if ($type == "seller") {
                 mysqli_query($connection, "DELETE FROM SellerAddresses WHERE sellerID = (SELECT sellerID FROM Sellers WHERE username = '".$username."'");
             }
             mysqli_close($connection);
-            die();
         }
     }
     // Success message & re-direct
     echo '<h2 class="my-3">Registration successful!</h2>';
     echo '<p>Welcome to freeBay.</p>';
     echo '<p><i>You have been logged in automatically, and will be redirected shortly.</i></p>';
-    header("refresh:5; url=browse.php");
+    header("refresh:5; url=index.php");
     $_SESSION['logged_in'] = true;
     $_SESSION['username'] = $_POST['username'];
     $_SESSION['account_type'] = $type;
-    $_SESSION['userID'] = mysqli_insert_id($connection);   
+    $_SESSION['userID'] = mysqli_insert_id($connection);
+    mysqli_close($connection);   
     die();
 }   
 

@@ -11,6 +11,6 @@ setcookie(session_name(), "", time() - 360);
 session_destroy();
 
 // Refresh the page
-header("Location: browse.php");
+header("Location: index.php");
 
 ?>

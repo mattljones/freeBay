@@ -10,6 +10,7 @@ $connection = mysqli_connect(host, username, password, database);
 function check_unique($conn, $username) {
     if (!$conn) {
         echo 'failure';
+        die();
     }
     else {
         $query = "SELECT username_check('$username')";
@@ -17,16 +18,19 @@ function check_unique($conn, $username) {
         if (!$result) {
             echo 'failure';
             mysqli_close($conn);
+            die();
         }
         else {
             $count = mysqli_fetch_array($result)[0];
             if ($count == 'unique') {
                 echo 'unique';
                 mysqli_close($conn);
+                die();
             }
             else {
                 echo 'not_unique';
                 mysqli_close($conn);
+                die();
             }
         }
     }

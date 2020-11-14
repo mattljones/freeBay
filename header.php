@@ -26,7 +26,7 @@
 
 <!-- Navbars -->
 <nav class="navbar navbar-expand-lg navbar-light bg-white mx-2">
-  <a class="navbar-brand" href="browse.php"><img src="assets/logo.png" class="img-fluid" height="30%" width="30%"></a>
+  <a class="navbar-brand" href="index.php"><img src="assets/logo.png" class="img-fluid" height="30%" width="30%"></a>
   <ul class="navbar-nav ml-auto">
     <li class="nav-item">
     
@@ -49,18 +49,18 @@
   <ul class="navbar-nav align-middle">
 <?php
   if (!isset($_SESSION['account_type'])) {
-  echo('
+    echo('
   <li class="nav-item mx-1">
-      <a class="nav-link" href="browse.php">Browse</a>
+      <a class="nav-link" href="index.php">Home</a>
     </li>');
-  }
+    }
   elseif (isset($_SESSION['account_type']) && $_SESSION['account_type'] == 'buyer') {
   echo('
   <li class="nav-item mx-1">
       <a class="nav-link text-white"><b>Logged in as:</b><i>&nbsp&nbsp'.$_SESSION['username'].'</i></a>
     </li>
   <li class="nav-item mx-1">
-      <a class="nav-link" href="browse.php">Browse</a>
+      <a class="nav-link" href="index.php">Home</a>
     </li>
   <li class="nav-item mx-1">
       <a class="nav-link" href="mybids.php">My Bids</a>
@@ -78,13 +78,10 @@
       <a class="nav-link text-white"><b>Logged in as:</b><i>&nbsp&nbsp'.$_SESSION['username'].'</i></a>
     </li>
   <li class="nav-item mx-1">
-      <a class="nav-link" href="browse.php">Browse</a>
+      <a class="nav-link" href="index.php">Home</a>
     </li>
 	<li class="nav-item mx-1">
       <a class="nav-link" href="mylistings.php">My Listings</a>
-    </li>
-  <li class="nav-item mx-1">
-      <a class="nav-link" href="mywatchlist.php">My Watchlist</a>
     </li>
 	<li class="nav-item ml-3">
       <a class="nav-link btn border-light" href="create_auction.php">+ Create auction</a>
