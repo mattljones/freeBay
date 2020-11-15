@@ -74,7 +74,7 @@
   
   if ($has_session == true) {
 	$sql_5 = "SELECT count(buyerID) FROM watching WHERE auctionID = $auction_id and buyerID = $buyer_id ";
-	$result = $conn->query($sql_4)->fetch_row() ?? false;
+	$result = $conn->query($sql_5)->fetch_row() ?? false;
 	if ($result[0] == 1) {
 		$watching = true;
 	} else {
@@ -177,12 +177,12 @@
 		
     <!-- Bidding form -->
 		<?php if ($has_session == true): ?>
-		<form method="POST" action="place_bid.php?auctionID=<?php echo $auction_id ?>" >
+		<form method="POST" onsubmit="return checkBidSubmit()" action="place_bid.php?auctionID=<?php echo $auction_id ?>">
 		  <div class="input-group">
 			<div class="input-group-prepend">
 			  <span class="input-group-text">£</span>
 			</div>
-			<input type="number" class="form-control" id="bid" name = "bid" min=<?php echo $min_bid; ?> step=<?php echo $min_increment; ?> required>
+			<input type="number" class="form-control" id="bid" name="bid" min=<?php echo $min_bid; ?> step=<?php echo $min_increment; ?> required>
 			<div class="input-group-append">
 			  <span class="input-group-text">Minimum bid: <?php echo "£" . $min_bid ?></span>
 			</div>
@@ -204,6 +204,33 @@
 <script> 
 // JavaScript functions: addToWatchlist and removeFromWatchlist.
 
+function checkBidSubmit() { 
+  var bid = $('#bid').val();
+  var auctionID = String([<?php echo($auction_id); ?>]);
+  var outcome = '';  
+  $.ajax({ 
+    url: "php/check_bid.php", 
+    async: false,
+	data: {"bid": bid, "auctionID": auctionID},
+	type: "POST",
+    success: function (data) {
+	  var s = !data.includes("invalid");
+	  if (s == false) {
+        outcome = false;
+		alert("The bid you entered is invalid! Please check the amount.")
+      }
+      else if (s == true) {
+		outcome = true;
+      }
+    }
+  });
+  return outcome;
+}
+
+</script>
+
+
+<script>
 function addToWatchlist(button) {
   console.log("These print statements are helpful for debugging btw");
 
@@ -281,4 +308,3 @@ bids.on('click', function() {
   }
 )
 </script>
-
