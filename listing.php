@@ -47,7 +47,7 @@
   $sql_3 = "SELECT bidDate, username, bidAmount FROM bids, buyers WHERE bids.buyerID = buyers.buyerID AND auctionID = $auction_id ORDER BY bidDate ";
   $result = $conn->query($sql_3) ?? false;
   
-  $table = '<table id="bidsTable" border="1" cellspacing="1" cellpadding="4">
+  $table = '<table border="1" cellspacing="1" cellpadding="4">
           <tr>
             <th>Bid Date</th>
             <th>Username</th> 
@@ -146,34 +146,56 @@
 
   <div class="col-sm-4"> <!-- Right col with bidding info -->
 
-    <p>
-	
 	<?php if ($now >= $end_time && $current_price >= $reserve_price): ?>
-	 <b>This auction ended on <?php echo(date_format($end_time, 'j M H:i')) ?></b><br>
-	 <b><?php echo("The item was sold for £" . number_format($current_price, 2)) ?></b>
-	 <p class="lead"><a href="#" id="bids">Number of bids: <?php echo(number_format($num_bids, 0)) ?></p></a>
- 	 <?php echo $table ?>	
+		<b>This auction ended on <?php echo(date_format($end_time, 'j M H:i')) ?></b><br>
+		<b><?php echo("The item was sold for £" . number_format($current_price, 2)) ?></b>
+		<div class="card">
+			<h5 class="card-header">
+			<a class="collapsed d-block" data-toggle="collapse" href="#" aria-expanded="true" aria-controls="bidsTable" id="bids">Number of bids: <?php echo(number_format($num_bids, 0)) ?>
+			</a></h5>
+			<div id="bidsTable" class="collapse" aria-labelledby="bids">
+				<div class="card-body">
+				<?php echo $table ?>
+				</div>
+			</div>
+		</div>	
 	
 	<?php elseif ($now >= $end_time && $current_price < $reserve_price): ?>
-	 <b>This auction ended on <?php echo(date_format($end_time, 'j M H:i')) ?></b><br>
-	 <b><?php echo("The item was not sold") ?></b>
-	 <p class="lead"><a href="#" id="bids">Number of bids: <?php echo(number_format($num_bids, 0)) ?></p></a>
-	 <?php echo $table ?>	
+		<b>This auction ended on <?php echo(date_format($end_time, 'j M H:i')) ?></b><br>
+		<b><?php echo("The item was not sold") ?></b>
+		<div class="card">
+			<h5 class="card-header">
+			<a class="collapsed d-block" data-toggle="collapse" href="#" aria-expanded="true" aria-controls="bidsTable" id="bids">Number of bids: <?php echo(number_format($num_bids, 0)) ?>
+			</a></h5>
+			<div id="bidsTable" class="collapse" aria-labelledby="bids">
+				<div class="card-body">
+				<?php echo $table ?>
+				</div>
+			</div>
+		</div>
 	 
 	<?php else: ?>
-     Auction ends <?php echo(date_format($end_time, 'j M H:i') . $time_remaining) ?></p> 
-	<hr class="rounded">	
-    <p class="lead">Starting price: £<?php echo(number_format($start_price, 2)) ?></p>
-	<p class="lead">Minimum increment: £<?php echo(number_format($min_increment, 2)) ?></p>
-	<p class="lead">Current bid: £<?php echo(number_format($current_price, 2)) ?></p>
-	<p class="lead"><a href="#" id="bids">Number of bids: <?php echo(number_format($num_bids, 0)) ?></p></a>
-	<?php echo $table ?>	
-		
+		<p>Auction ends <?php echo(date_format($end_time, 'j M H:i') . $time_remaining) ?></p> 
+		<hr class="rounded">	
+		<p class="lead">Starting price: £<?php echo(number_format($start_price, 2)) ?></p>
+		<p class="lead">Minimum increment: £<?php echo(number_format($min_increment, 2)) ?></p>
+		<p class="lead">Current bid: £<?php echo(number_format($current_price, 2)) ?></p>
 		<?php if ($current_price < $reserve_price): ?>
-		<p class="lead">Reserve price has not been reached!</p>
+			<p class="lead">Reserve price has not been reached!</p>
 		<?php else: ?>
-		<p class="lead">Reserve price has been reached!</p>
+			<p class="lead">Reserve price has been reached!</p>
 		<?php endif ?>
+	
+		<div class="card">
+			<h5 class="card-header">
+			<a class="collapsed d-block" data-toggle="collapse" href="#" aria-expanded="true" aria-controls="bidsTable" id="bids">Number of bids: <?php echo(number_format($num_bids, 0)) ?>
+			</a></h5>
+			<div id="bidsTable" class="collapse" aria-labelledby="bids">
+				<div class="card-body">
+				<?php echo $table ?>
+				</div>
+			</div>
+		</div><br>
 		
     <!-- Bidding form -->
 		<?php if ($has_session == true): ?>
@@ -228,7 +250,6 @@ function checkBidSubmit() {
 }
 
 </script>
-
 
 <script>
 function addToWatchlist(button) {
