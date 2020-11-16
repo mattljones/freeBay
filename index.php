@@ -169,8 +169,9 @@
     <hr>
     <?php
       $priceChecked = "";
+      $bidsChecked = "";
+      $watchersChecked ="";
       if (isset($_POST['checkedOrder'])) {
-        print("POSTED THE CHCKED ORDER TEST");
         if (in_array("checkLowPrice", $_POST['checkedOrder'])) {
           $priceChecked = "checked";
         }
