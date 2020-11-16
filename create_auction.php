@@ -44,8 +44,8 @@ include_once("header.php")?>
           <label for="auctionCategory" class="col-sm-2 col-form-label text-right">Category</label>
           <div class="col-sm-10">
             <select class="form-control" id="auctionCategory" name='Category' required="required">
-              <option selected>Choose...</option>
-              <option value="Collectables & antiques">Collectables & antiques</option>
+              <option selected><option value="Collectables & antiques">Collectables & antiques</option>
+          
               <option value="Electronics">Electronics</option>
               <option value="Fashion">Fashion</option>
               <option value="Home & garden">Home & garden</option>
@@ -151,39 +151,46 @@ function modifysubmit(){
    var startPrice= parseInt(document.getElementById("startingPrice").value);
    var reservePrice= parseInt(document.getElementById("ReservePrice").value);
    var minIncrement= parseInt(document.getElementById("minIncrement").value);
+   var category= parseInt(document.getElementById("auctionCategory").value);
     
     var tempDate1=Date.parse(Startdate);
     var tempDate2=Date.parse(Enddate);
 
     var tempNowDate=Date.parse(getDT());
     
+    if(category==""){
+      document.getElementById("categoryHelp").innerHTML="<font color ='red'>Please enter a valid value</font>";
+      return false;
+   }else{
+     document.getElementById("categoryHelp").innerHTML="";
+   }
    if(0>= startPrice){
-      document.getElementById("startBidHelp").innerHTML="<font color ='red'>Please enter valid value</font>";
+      document.getElementById("startBidHelp").innerHTML="<font color ='red'>Please enter a valid value</font>";
       return false;
    }else{
      document.getElementById("startBidHelp").innerHTML="";
    }
    if(0>= reservePrice){
-      document.getElementById("reservePriceHelp").innerHTML="<font color ='red'>Please enter valid value</font>";
+      document.getElementById("reservePriceHelp").innerHTML="<font color ='red'>Please enter a valid value</font>";
       return false;
    }else{
      document.getElementById("reservePriceHelp").innerHTML="";
    }
    if(startPrice>reservePrice){
-      document.getElementById("reservePriceHelp").innerHTML="<font color ='red'>Please enter valid value</font>";
+      document.getElementById("reservePriceHelp").innerHTML="<font color ='red'>Please enter a valid value</font>";
       return false;
    }else{
      document.getElementById("reservePriceHelp").innerHTML="";
    }
    if(0>= minIncrement){
-      document.getElementById("minIncrementHelp").innerHTML="<font color ='red'>Please enter valid value</font>";
+      document.getElementById("minIncrementHelp").innerHTML="<font color ='red'>Please enter a valid value</font>";
       return false;
    }else{
      document.getElementById("minIncrementHelp").innerHTML="";
    }
  if(tempDate1<tempNowDate){
       console.log('err2');
-      document.getElementById("StartDateHelp").innerHTML="<font color ='red'>Please enter valid date</font>";
+      document.getElementById("StartDateHelp").innerHTML="<font color ='red'>Please enter a valid date</font>";
       return false;
    }else{
       document.getElementById("StartDateHelp").innerHTML="";
@@ -191,7 +198,7 @@ function modifysubmit(){
 
    if(tempDate1>= tempDate2){
       console.log('err3');
-      document.getElementById("endDateHelp").innerHTML="<font color ='red'>Please enter valid value</font>";
+      document.getElementById("endDateHelp").innerHTML="<font color ='red'>Please enter a valid value</font>";
       return false;
    }else{
       document.getElementById("endDateHelp").innerHTML="";
@@ -222,6 +229,8 @@ function minInput_onblur(){
    if((ReservePrice-startingPrice)<minIncrement)
    {
      document.getElementById("minIncrementHelp").innerHTML="<font color ='coral'>Maybe too high</font>";
+   }else{
+    document.getElementById("minIncrementHelp").innerHTML=""
    }
 }
 

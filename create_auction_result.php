@@ -36,9 +36,7 @@ $createDate=date("Y-m-d H:i:s");
 $startDate=$_POST['Startdate'];
 $endDate=$_POST['Enddate'];
 
-//need username to replace this default value
-$seller='rulesuper';// $_SESSION['account_type'] replace the 'rulesuper'
-
+$sellerID=$_SESSION['userID'];
 
 // /* TODO #3: If everything looks good, make the appropriate call to insert
 //             data into the database. */
@@ -90,10 +88,7 @@ $categoryID = $row1[0];
 
 
 
-$query2 = "SELECT sellerID FROM sellers WHERE username = '$seller'";
-$result2 = mysqli_query($conn,$query2);
-$row2 = mysqli_fetch_row($result2);
-$sellerID = $row2[0];
+
 
 
 $query3="INSERT INTO Auctions(title, descript, createDate, startDate, endDate, startPrice, reservePrice, minIncrement, sellerID,categoryID) VALUES
