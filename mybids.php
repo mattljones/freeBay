@@ -8,7 +8,7 @@
   if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
 	$buyer_id = $_SESSION['userID'];
   } else {
-    $buyer_id = null;
+    $buyer_id = 999999999;
   }
 
   //Create connection
@@ -32,12 +32,13 @@
   <div class="col-sm-10">
     <div id="productCards" class="row">
       <?php
-      $sql = "SELECT a.auctionID, a.title, a.descript, a.endDate, a.startPrice, a.reservePrice, c.categoryName 
+      $sql = "SELECT a.auctionID, a.title, a.descript, a.endDate, a.startPrice, a.reservePrice, c.categoryName, MAX(b.bidAmount) AS YourHighestBid  
 			  FROM auctions a 
 			  JOIN bids b ON a.auctionID = b.auctionID 
 			  JOIN categories c ON a.categoryID = c.categoryID 
 			  WHERE b.buyerID = $buyer_id AND a.auctionID IN 
-			  (SELECT DISTINCT a.auctionID FROM auctions a JOIN bids b ON a.auctionID = b.auctionID WHERE b.buyerID = $buyer_id);";
+			  (SELECT DISTINCT a.auctionID FROM auctions a JOIN bids b ON a.auctionID = b.auctionID WHERE b.buyerID = $buyer_id)
+			  GROUP BY a.auctionID, a.title, a.descript, a.endDate, a.startPrice, a.reservePrice, c.categoryName;";
       $resultset = mysqli_query($conn, $sql) or die("database error:" . mysqli_error($conn));
 	  // Check if the user has placed any bids
 	  //$testrecord = mysqli_fetch_assoc($resultset);
