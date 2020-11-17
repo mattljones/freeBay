@@ -6,7 +6,6 @@
    
   // Check if user is logged in
   if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
-    
 	$buyer_id = $_SESSION['userID'];
   } else {
     $buyer_id = null;
@@ -33,16 +32,22 @@
   <div class="col-sm-10">
     <div id="productCards" class="row">
       <?php
-      $sql = "SELECT a.auctionID, a.title, a.descript, a.endDate, a.startPrice, a.reservePrice, c.categoryName, MAX(b.bidAmount) AS YourHighestBid 
+      $sql = "SELECT a.auctionID, a.title, a.descript, a.endDate, a.startPrice, a.reservePrice, c.categoryName 
 			  FROM auctions a 
 			  JOIN bids b ON a.auctionID = b.auctionID 
 			  JOIN categories c ON a.categoryID = c.categoryID 
 			  WHERE b.buyerID = $buyer_id AND a.auctionID IN 
-			  (SELECT DISTINCT a.auctionID FROM auctions a JOIN bids b ON a.auctionID = b.auctionID WHERE b.buyerID = $buyer_id) 
-			  GROUP BY a.auctionID, a.title, a.descript, a.endDate, a.startPrice, a.reservePrice, c.categoryName;";
+			  (SELECT DISTINCT a.auctionID FROM auctions a JOIN bids b ON a.auctionID = b.auctionID WHERE b.buyerID = $buyer_id);";
       $resultset = mysqli_query($conn, $sql) or die("database error:" . mysqli_error($conn));
+	  // Check if the user has placed any bids
+	  //$testrecord = mysqli_fetch_assoc($resultset);
+	  if (mysqli_num_rows($resultset) == 0) {
+		echo "You haven't placed any bids yet!";
+	  }
+	  
+	  // If the user has bids, continue to show the relevant information
       while ($record = mysqli_fetch_assoc($resultset)) {
-        $end_time = new DateTime($record['endDate']);
+		$end_time = new DateTime($record['endDate']);
         $now = new DateTime();
         $productID = $record['auctionID'];
         if ($now < $end_time) {
@@ -58,7 +63,6 @@
         $productDescript = $record['descript'];
         $productStartPrice = $record['startPrice'];
         $productReservePrice = $record['reservePrice'];
-		$yourHighestBid = $record['YourHighestBid'];
 			
 		$sql2 = "SELECT a.auctionID,
 					CASE
