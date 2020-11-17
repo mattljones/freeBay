@@ -242,7 +242,7 @@ function checkBidSubmit() {
         outcome = false;
 		alert("The bid you entered is invalid! Please check the amount.")
       }
-      else if (s1 == true and s2 == true) {
+      else if (s1 == true && s2 == true) {
 		outcome = true;
       }
     }
