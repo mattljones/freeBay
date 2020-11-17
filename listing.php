@@ -236,12 +236,13 @@ function checkBidSubmit() {
 	data: {"bid": bid, "auctionID": auctionID},
 	type: "POST",
     success: function (data) {
-	  var s = !data.includes("invalid");
-	  if (s == false) {
+	  var s1 = !data.includes("invalid");
+	  var s2 = data.includes("valid");
+	  if (s1 == false) {
         outcome = false;
 		alert("The bid you entered is invalid! Please check the amount.")
       }
-      else if (s == true) {
+      else if (s1 == true and s2 == true) {
 		outcome = true;
       }
     }
