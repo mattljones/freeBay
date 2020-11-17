@@ -4,14 +4,6 @@
 
 <?php
   
-  // Check if user is logged in
-  if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
-    $has_session = true;
-	$buyer_id = $_SESSION['userID'];
-  } else {
-    $has_session = false;
-  }
-
   // Create connection
   require_once('private/database_credentials.php');
   $conn = mysqli_connect(host, username, password, database);
@@ -20,13 +12,36 @@
 	die("Connection failed: " . $conn->connect_error);
   }
   
+ 
+  // Check if user is logged in
+  if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
+    $has_session = true;
+	$buyer_id = $_SESSION['userID'];
+	$username = $_SESSION['username'];
+  } else {
+    $has_session = false;
+  }
+
+  // Collect user type
+  $query_type_buyer = "SELECT 1 FROM Buyers WHERE username = '".$username."'";
+  $result_buyer = mysqli_query($conn, $query_type_buyer);
+  $query_type_seller = "SELECT 1 FROM Sellers WHERE username = '".$username."'";
+  $result_seller = mysqli_query($conn, $query_type_seller);
+  if (mysqli_fetch_array($result_buyer)[0] == '1') {
+	$type = 'buyer';
+  }
+  else {
+	$type = 'seller';
+  }
+
+
   // Get auctionID from the URL
   $auction_id = $_GET['auctionID'];
   
   // Get item description, title, and remaining time
   $sql_1 = "SELECT a.title, a.descript, a.endDate, a.startPrice, a.reservePrice, a.minIncrement, c.categoryName 
-			FROM auctions a
-			LEFT JOIN categories c on a.categoryID = c.categoryID 	
+			FROM Auctions a
+			LEFT JOIN Categories c on a.categoryID = c.categoryID 	
 			WHERE auctionID = $auction_id ";
   $result = $conn->query($sql_1)->fetch_row() ?? false;
   $title = $result[0];
@@ -38,13 +53,13 @@
   $category = $result[6];
   
   // Get current price and number of bids
-  $sql_2 = "SELECT max(bidAmount), count(bidID) FROM bids WHERE auctionID = $auction_id ";
+  $sql_2 = "SELECT max(bidAmount), count(bidID) FROM Bids WHERE auctionID = $auction_id ";
   $result = $conn->query($sql_2)->fetch_row() ?? false;
   $current_price = floatval($result[0]);
   $num_bids = $result[1];
     
   // Get bid history and put it in a table
-  $sql_3 = "SELECT bidDate, username, bidAmount FROM bids, buyers WHERE bids.buyerID = buyers.buyerID AND auctionID = $auction_id ORDER BY bidDate ";
+  $sql_3 = "SELECT bidDate, username, bidAmount FROM Bids, Buyers WHERE bids.buyerID = buyers.buyerID AND auctionID = $auction_id ORDER BY bidDate ";
   $result = $conn->query($sql_3) ?? false;
   
   $table = '<table border="1" cellspacing="1" cellpadding="4">
@@ -73,7 +88,7 @@
   //       For now, this is hardcoded.
   
   if ($has_session == true) {
-	$sql_5 = "SELECT count(buyerID) FROM watching WHERE auctionID = $auction_id and buyerID = $buyer_id ";
+	$sql_5 = "SELECT count(buyerID) FROM Watching WHERE auctionID = $auction_id and buyerID = $buyer_id ";
 	$result = $conn->query($sql_5)->fetch_row() ?? false;
 	if ($result[0] == 1) {
 		$watching = true;
@@ -116,18 +131,18 @@
   
   <div class="col-sm-4 align-self-center"> <!-- Right col -->
 <?php  if ($now < $end_time): ?>
-    <div id="watch_nowatch" <?php if (($has_session && $watching) || (!$has_session)) echo('style="display: none"');?> >
+    <div id="watch_nowatch" <?php if (($has_session && $watching) || (!$has_session) || ($type == "seller")) echo('style="display: none"');?> >
       <button type="button" class="btn btn-outline-secondary btn-sm" onclick="addToWatchlist()">+ Add to watchlist</button>	
 	  <button type="button" class="btn btn-outline-secondary btn-sm" disabled>Number of watchers: <?php echo $num_watchers ?></button>
     </div>
-	
+<?php endif /* Print nothing otherwise */ ?>
 
-    <div id="watch_watching" <?php if (!$has_session || !$watching) echo('style="display: none"');?> >
+    <div id="watch_watching" <?php if (!$has_session || !$watching || ($type == "seller") ) echo('style="display: none"');?> >
       <button type="button" class="btn btn-success btn-sm" disabled>Watching</button>
       <button type="button" class="btn btn-danger btn-sm" onclick="removeFromWatchlist()">Remove watch</button>
 	  <button type="button" class="btn btn-outline-secondary btn-sm" disabled>Number of watchers: <?php echo $num_watchers ?></button>
     </div>
-<?php endif /* Print nothing otherwise */ ?>
+
   </div>
 
 </div>
@@ -147,8 +162,8 @@
   <div class="col-sm-4"> <!-- Right col with bidding info -->
 
 	<?php if ($now >= $end_time && $current_price >= $reserve_price): ?>
-		<b>This auction ended on <?php echo(date_format($end_time, 'j M H:i')) ?></b><br>
-		<b><?php echo("The item was sold for £" . number_format($current_price, 2)) ?></b>
+		<p>This auction ended on <?php echo(date_format($end_time, 'j M H:i')) ?>.</p>
+		<p>The item was sold for £<?php echo(number_format($current_price, 2)) ?>.</p>
 		<div class="card">
 			<h5 class="card-header">
 			<a class="collapsed d-block" data-toggle="collapse" href="#" aria-expanded="true" aria-controls="bidsTable" id="bids">Number of bids: <?php echo(number_format($num_bids, 0)) ?>
@@ -161,8 +176,8 @@
 		</div>	
 	
 	<?php elseif ($now >= $end_time && $current_price < $reserve_price): ?>
-		<b>This auction ended on <?php echo(date_format($end_time, 'j M H:i')) ?></b><br>
-		<b><?php echo("The item was not sold") ?></b>
+		<p>This auction ended on <?php echo(date_format($end_time, 'j M H:i')) ?>.</p>
+		<p>The reserve price was not reached and the item was not sold.</p>
 		<div class="card">
 			<h5 class="card-header">
 			<a class="collapsed d-block" data-toggle="collapse" href="#" aria-expanded="true" aria-controls="bidsTable" id="bids">Number of bids: <?php echo(number_format($num_bids, 0)) ?>
@@ -197,16 +212,16 @@
 			</div>
 		</div><br>
 		
-    <!-- Bidding form -->
+    <!-- Bidding form, shown only to buyers -->
 		<?php if ($has_session == true): ?>
-		<form method="POST" onsubmit="return checkBidSubmit()" action="place_bid.php?auctionID=<?php echo $auction_id ?>">
+		<form method="POST" onsubmit="return checkBidSubmit()" action="place_bid.php?auctionID=<?php echo $auction_id ?>" <?php if ($type == "seller") echo('style="display: none"');?>>
 		  <div class="input-group">
 			<div class="input-group-prepend">
 			  <span class="input-group-text">£</span>
 			</div>
-			<input type="number" class="form-control" id="bid" name="bid" min=<?php echo $min_bid; ?> step=<?php echo $min_increment; ?> required>
+			<input type="number" class="form-control" id="bid" name="bid" min=<?php echo floatval($min_bid); ?> required>
 			<div class="input-group-append">
-			  <span class="input-group-text">Minimum bid: <?php echo "£" . $min_bid ?></span>
+			  <span class="input-group-text">Minimum bid: <?php echo "£" . floatval($min_bid) ?></span>
 			</div>
 		  </div>
 		  <button type="submit" class="btn btn-primary form-control">Place bid</button>
@@ -224,7 +239,7 @@
 
 
 <script> 
-// JavaScript functions: addToWatchlist and removeFromWatchlist.
+// Function to validate the bid amount input
 
 function checkBidSubmit() { 
   var bid = $('#bid').val();
@@ -253,24 +268,23 @@ function checkBidSubmit() {
 </script>
 
 <script>
+// JavaScript functions: addToWatchlist and removeFromWatchlist.
 function addToWatchlist(button) {
-  console.log("These print statements are helpful for debugging btw");
-
   // This performs an asynchronous call to a PHP function using POST method.
   // Sends item ID as an argument to that function.
   $.ajax('watchlist_funcs.php', {
     type: "POST",
-    data: {functionname: 'add_to_watchlist', arguments: [<?php echo($item_id);?>]},
+    data: {functionname: 'add_to_watchlist', arguments: [<?php echo($auction_id);?>]},
 
     success: 
       function (obj, textstatus) {
         // Callback function for when call is successful and returns obj
-        console.log("Success");
         var objT = obj.trim();
  
-        if (objT == "success") {
-          $("#watch_nowatch").hide();
+        if (objT.includes("success")) {
+		  $("#watch_nowatch").hide();
           $("#watch_watching").show();
+		  location.reload();
         }
         else {
           var mydiv = document.getElementById("watch_nowatch");
@@ -292,20 +306,20 @@ function removeFromWatchlist(button) {
   // Sends item ID as an argument to that function.
   $.ajax('watchlist_funcs.php', {
     type: "POST",
-    data: {functionname: 'remove_from_watchlist', arguments: [<?php echo($item_id);?>]},
-
+    data: {functionname: 'remove_from_watchlist', arguments: [<?php echo($auction_id);?>]},
     success: 
       function (obj, textstatus) {
         // Callback function for when call is successful and returns obj
-        console.log("Success");
         var objT = obj.trim();
  
-        if (objT == "success") {
+        if (objT.includes("success")) {
           $("#watch_watching").hide();
           $("#watch_nowatch").show();
+		  location.reload();
         }
         else {
-          var mydiv = document.getElementById("watch_watching");
+		  alert(objT);
+		  var mydiv = document.getElementById("watch_watching");
           mydiv.appendChild(document.createElement("br"));
           mydiv.appendChild(document.createTextNode("Watch removal failed. Try again later."));
         }

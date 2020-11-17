@@ -3,7 +3,7 @@
 
 <?php
 
-  //Create connection
+  // Create connection
   require_once('private/database_credentials.php');
   $conn = mysqli_connect(host, username, password, database);
   // Check connection
@@ -11,10 +11,17 @@
 	die("Connection failed: " . $conn->connect_error);
   }
   
-  //Determine values to enter into the bids table
+  // Determine values to enter into the bids table
   $now = new DateTime();
   $bid_date = $now->format("Y-m-d H:i:s");
-  $bid_amount = $_POST['bid'];
+  
+  // Check if bid is posted
+  if (!isset($_POST['bid'])) {
+	header("refresh:0; url=index.php");
+	die();
+  }
+  $bid_amount = round($_POST['bid'], 2);
+
   $auction_id = $_GET['auctionID'];
   // Check if user is logged in
   if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
@@ -23,8 +30,9 @@
 	$buyer_id = null;
   }
 
-  //Insert the records into the database
-  $sql = "INSERT INTO bids (bidDate, bidAmount, buyerID, auctionID) VALUES ('$bid_date', '$bid_amount', '$buyer_id', '$auction_id')";
+  // Insert the records into the database
+  // Not validating bid here since the validation is built into the server with the function bid_check
+  $sql = "INSERT INTO Bids (bidDate, bidAmount, buyerID, auctionID) VALUES ('$bid_date', '$bid_amount', '$buyer_id', '$auction_id')";
   
   if ($conn->query($sql) === TRUE) {
   	$bid = 1;
