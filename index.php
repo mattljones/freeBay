@@ -5,7 +5,7 @@
 //header("Location: browse.php");
 ?>
 <?php include_once("header.php"); ?>
-<?php require("utilities.php");?>
+<?php require("utilities.php"); ?>
 <hr>
 
 <div class="col-md-10 col-lg-8 col-xl-7 mx-auto">
@@ -35,7 +35,7 @@
         </select> -->
 
 <div class="row" style="margin:0;">
-  <div class="col-md-3">
+  <div class="col-md-2">
     <h1>Categories</h1>
     <hr>
     <div class="list-group">
@@ -70,19 +70,23 @@
           }
           ?>
           <button type="submit" class="btn btn-outline-primary" style="margin-top: 5%;">Apply</button>
-        </form>
+        <!--</form> -->
         <button id="checkAll" class="btn btn-outline-primary" style="margin-top: 5%;">Reset filters</button>
       </div>
     </div>
 
 
   </div>
-  <div class="col-md-9">
+  <div class="col-md-8">
     <h1>Our Latest Auctions</h1>
     <hr>
     <div id="productCards" class="row">
       <?php
-      $sql = "SELECT * FROM Auctions JOIN Categories ON Auctions.categoryID = Categories.categoryID";
+      $sqlMaxBid = "SELECT MAX(bidAmount) as maxBid, coalesce(count(bidID), 0) as noOfBidders, auctionID, buyerID FROM Bids GROUP BY auctionID";
+      $sqlMainMaxBid = "SELECT mainTable.*, coalesce(maxBid,mainTable.startPrice) as maxBid,  coalesce(noOfBidders,0) as noOfBidders, buyerID as maxBidderID FROM Auctions mainTable LEFT JOIN ($sqlMaxBid) maxBidTable ON mainTable.auctionID = maxBidTable.auctionID";
+      $sqlWatchTable = "SELECT COUNT(auctionID) as noOfWatching, auctionID FROM `Watching` GROUP BY auctionID";
+      $sqlMainMaxBidWatch = "SELECT mainTable.*, coalesce(noOfWatching,0) as noOfWatching FROM ($sqlMainMaxBid) mainTable LEFT JOIN ($sqlWatchTable) watchTable ON mainTable.auctionID = watchTable.auctionID";
+      $sql = "SELECT mainTable.*, categoryName FROM ($sqlMainMaxBidWatch) mainTable INNER JOIN Categories ON mainTable.categoryID = Categories.categoryID";
       if (isset($_POST['checkedCategories'])) {
         $sql .= " WHERE Categories.`categoryID` IN (";
         $categories = implode(',', $_POST['checkedCategories']);
@@ -91,14 +95,26 @@
         $sql .= $categories;
         $sql .= ")";
       }
+      if (isset($_POST['checkedOrder'])) {
+        $sql .= " ORDER BY ";
+        if (in_array("checkLowPrice", $_POST['checkedOrder'])) {
+          $sql .= "maxBid";
+        }
+        if(in_array("checkNoBids", $_POST['checkedOrder'])) {
+          $sql .= "noOfBidders";
+        }
+        if(in_array("checkNoWatchers", $_POST['checkedOrder'])) {
+          $sql .= "noOfWatching";
+        }
+      }
       $resultset = mysqli_query($conn, $sql) or die("database error:" . mysqli_error($conn));
       while ($record = mysqli_fetch_assoc($resultset)) {
         $productAuctionID = $record['auctionID'];;
         $sql2 = "SELECT max(bidAmount) as currentPrice, count(bidID) FROM Bids WHERE auctionID = $productAuctionID ";
         $sql3 = "SELECT count(auctionID) as noOfWatchers FROM Watching WHERE auctionID = $productAuctionID ";
         $result = $conn->query($sql2)->fetch_assoc() ?? false;
-        $result3 = $conn->query($sql3)->fetch_assoc() ?? false;
-        $productCurrentPrice = $result['currentPrice'];
+        #$result3 = $conn->query($sql3)->fetch_assoc() ?? false;
+        $productCurrentPrice = $record['maxBid'];
         #print($productCurrentPrice);
         #print_r($result);
         #$recordBids = mysqli_fetch_assoc($result);
@@ -108,8 +124,7 @@
         if ($now < $end_time) {
           $time_to_end = date_diff($now, $end_time);
           $productTimeLeft = ' Auction will end in ' . display_time_remaining($time_to_end) . '';
-        }
-        else {
+        } else {
           $productTimeLeft = "Auction Ended";
         }
         $productTitle = $record['title'];
@@ -117,8 +132,8 @@
         $productDescript = $record['descript'];
         $productStartPrice = $record['startPrice'];
         $productReservePrice = $record['reservePrice'];
-        $productBidders = $result['count(bidID)'];
-        $productWatchers = $result3['noOfWatchers'];
+        $productBidders = $record['noOfBidders'];
+        $productWatchers = $record['noOfWatching'];
 
         if ($productCurrentPrice == false) {
           $productCurrentPrice = $productStartPrice;
@@ -133,7 +148,7 @@
             <p class="card-text">No of Bidders: <?php echo $productBidders ?></p>
             <p class="card-text">No of Watchers: <?php echo $productWatchers ?></p>
             <p class="card-text"><?php echo $productDescript ?><br> Start Price: <?php echo $productStartPrice ?></p>
-            <p class="card-text"><?php echo $productTimeLeft?></p>
+            <p class="card-text"><?php echo $productTimeLeft ?></p>
             <!-- <a href="listing.php?auctionID=<?= $productID ?>" type="submit" class="btn btn-outline-primary text-center">View Item</a> -->
           </div>
           <div class="card-footer">
@@ -149,42 +164,80 @@
       <?php   } ?>
     </div>
   </div>
-  </body>
-
-  <script>
-    function uncheckAll() {
-      $("input[type='checkbox']:checked").prop("checked", false)
-      <?php 
-        $_POST['checkedCategories'] = array();
-      ?>
-    }
-    $('#checkAll').on('click', uncheckAll)
-
-    $(document).ready(function() {
-      $('#searchbox').on("keyup", function() {
-        var value = $(this).val().toLowerCase();
-        $(".card").filter(function() {
-          $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-        });
-      });
-    });
-
-    $(document).ready(function() {
-      $('#update_indication_id').on("change", function() {
-        var value = $(this).val().toLowerCase();
-        $(".card").filter(function() {
-          $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-        });
-      });
-    });
-
-    $.each($('*'), function() {
-      if ($(this).width() > $('body').width()) {
-        console.log("Wide Element: ", $(this), "Width: ",
-          $(this).width());
+  <div class="col-md-2">
+    <h1>Order by</h1>
+    <hr>
+    <?php
+      $priceChecked = "";
+      $bidsChecked = "";
+      $watchersChecked ="";
+      if (isset($_POST['checkedOrder'])) {
+        if (in_array("checkLowPrice", $_POST['checkedOrder'])) {
+          $priceChecked = "checked";
+        }
+        if(in_array("checkNoBids", $_POST['checkedOrder'])) {
+          $bidsChecked = "checked";
+        }
+        if(in_array("checkNoWatchers", $_POST['checkedOrder'])) {
+          $watchersChecked = "checked";
+        }
       }
-    });
-  </script>
-</div>
+    ?>
+    <div class="form-group" style="margin-bottom: 1rem">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="checkLowPrice" id="sortPriceCheck1" name="checkedOrder[]" <?php echo $priceChecked ?> >
+          <label class="form-check-label" for="sortPriceCheck1">Sort by Lowest Price</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="checkNoBids" id="sortNoBidsCheck1" name="checkedOrder[]" <?php echo $bidsChecked ?> >
+          <label class="form-check-label" for="sortNoBidsCheck1">Sort by Number of Bidders</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="checkNoWatchers" id="sortNoWatchersCheck1" name="checkedOrder[]" <?php echo $watchersChecked ?> >
+          <label class="form-check-label" for="sortNoWatchersCheck1">Sort by Number of Watchers</label>
+        </div>
+      <button type="submit" class="btn btn-outline-primary" style="margin-left: 30px">Apply</button>
+    </div>
+    </form>
 
-<?php include_once("footer.php")?>
+  </div>
+
+    </body>
+
+    <script>
+      function uncheckAll() {
+        $("input[type='checkbox']:checked").prop("checked", false)
+        <?php
+        $_POST['checkedCategories'] = array();
+        ?>
+      }
+      $('#checkAll').on('click', uncheckAll)
+
+      $(document).ready(function() {
+        $('#searchbox').on("keyup", function() {
+          var value = $(this).val().toLowerCase();
+          $(".card").filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+          });
+        });
+      });
+
+      $(document).ready(function() {
+        $('#update_indication_id').on("change", function() {
+          var value = $(this).val().toLowerCase();
+          $(".card").filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+          });
+        });
+      });
+
+      $.each($('*'), function() {
+        if ($(this).width() > $('body').width()) {
+          console.log("Wide Element: ", $(this), "Width: ",
+            $(this).width());
+        }
+      });
+    </script>
+  </div>
+
+  <?php include_once("footer.php") ?>

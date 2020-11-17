@@ -16,7 +16,12 @@
   $bid_date = $now->format("Y-m-d H:i:s");
   $bid_amount = $_POST['bid'];
   $auction_id = $_GET['auctionID'];
-  $buyer_id = $_SESSION['userID'];
+  // Check if user is logged in
+  if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
+	$buyer_id = $_SESSION['userID'];
+  } else {
+	$buyer_id = null;
+  }
 
   //Insert the records into the database
   $sql = "INSERT INTO bids (bidDate, bidAmount, buyerID, auctionID) VALUES ('$bid_date', '$bid_amount', '$buyer_id', '$auction_id')";
