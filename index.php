@@ -185,15 +185,15 @@
     ?>
     <div class="form-group" style="margin-bottom: 1rem">
         <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="checkLowPrice" id="sortPriceCheck1" name="checkedOrder[]" <?php echo $priceChecked ?> >
+          <input class="form-check-input" type="radio" value="checkLowPrice" id="sortPriceCheck1" name="checkedOrder[]" <?php echo $priceChecked ?> >
           <label class="form-check-label" for="sortPriceCheck1">Sort by Lowest Price</label>
         </div>
         <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="checkNoBids" id="sortNoBidsCheck1" name="checkedOrder[]" <?php echo $bidsChecked ?> >
+          <input class="form-check-input" type="radio" value="checkNoBids" id="sortNoBidsCheck1" name="checkedOrder[]" <?php echo $bidsChecked ?> >
           <label class="form-check-label" for="sortNoBidsCheck1">Sort by Number of Bidders</label>
         </div>
         <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="checkNoWatchers" id="sortNoWatchersCheck1" name="checkedOrder[]" <?php echo $watchersChecked ?> >
+          <input class="form-check-input" type="radio" value="checkNoWatchers" id="sortNoWatchersCheck1" name="checkedOrder[]" <?php echo $watchersChecked ?> >
           <label class="form-check-label" for="sortNoWatchersCheck1">Sort by Number of Watchers</label>
         </div>
       <button type="submit" class="btn btn-outline-primary" style="margin-left: 30px">Apply</button>

@@ -103,8 +103,8 @@ include_once("header.php")?>
             <!-- <input type="datetime-local" class="form-control" id="Startdate" name="Startdate"  value="
               =(date('Y-m-d')."T".date('H:i'))
               "> -->
-            <input type="datetime-local" class="form-control" id="Startdate" name="Startdate"  />
-            <small id="StartDateHelp" class="form-text text-muted">Optional. Day for the auction to Start.</small>
+            <input type="datetime-local" class="form-control" id="Startdate" name="Startdate"  required="required"/>
+            <small id="StartDateHelp" class="form-text text-muted"><span class="text-danger">* Required.</span>Day for the auction to Start.</small>
           </div>
         </div>
         <div class="form-group row">
