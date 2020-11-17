@@ -44,20 +44,32 @@ include_once("header.php")?>
           <label for="auctionCategory" class="col-sm-2 col-form-label text-right">Category</label>
           <div class="col-sm-10">
             <select class="form-control" id="auctionCategory" name='Category' required="required">
-              <option selected><option value="Collectables & antiques">Collectables & antiques</option>
-          
-              <option value="Electronics">Electronics</option>
-              <option value="Fashion">Fashion</option>
-              <option value="Home & garden">Home & garden</option>
-              <option value="Jewellery & watches">Jewellery & watches</option>
-              <option value="Motors">Motors</option>
-              <option value="Sporting goods">Sporting goods</option>
-              <option value="Toys & games">Toys & games</option>
-              <option value="Books, comics & magazines">Books, comics & magazines</option>
-              <option value="Health & beauty">Health & beauty</option>
-              <option value="Musical instruments">Musical instruments</option>
-              <option value="Business, office & industrial">Business, office & industrial</option>
-            </select>
+            <option selected value="" style="display:none" disabled>Choose your Category</option>
+              <?php
+                require_once('private/database_credentials.php');
+                $connection = mysqli_connect(host, username, password, database);
+                if (!$connection) {
+                  echo '</select>';
+                  echo '<small class="form-text text-muted"><span class="bg-warning text-dark">&nbspError connecting to the database. Please try refreshing the page (you will lose your form data).&nbsp</span></small>';
+                }
+                else {
+                  $query = 'SELECT categoryName FROM Categories ORDER BY categoryName ASC';
+                  $result = mysqli_query($connection, $query);
+                  if (!$result) {
+                    echo '</select>';
+                    echo '<small class="form-text text-muted"><span class="bg-warning text-dark">&nbspError collecting category data from the database. Please try refreshing the page (you will lose your form data).&nbsp</span></small>';
+                    mysqli_close($connection);
+                  }
+                  else {
+                    while ($row = mysqli_fetch_array($result)) {
+                    echo '<option>'.$row['categoryName'].'</option>';
+                    };
+                    echo '</select>';
+                  
+                    mysqli_close($connection);
+                  }
+                }
+              ?>
             <small id="categoryHelp" class="form-text text-muted"><span class="text-danger">* Required.</span> Select a category for this item.</small>
           </div>
         </div>
