@@ -74,14 +74,17 @@
     <hr>
     <div id="productCards" class="row">
       <?php
-      $sql = "SELECT * FROM Auctions JOIN Categories ON Auctions.categoryID = Categories.categoryID WHERE sellerID=$sellerID";
+      $sql = "SELECT * FROM Auctions JOIN Categories ON Auctions.categoryID = Categories.categoryID";
       if (isset($_POST['checkedCategories'])) {
         $sql .= " WHERE Categories.`categoryID` IN (";
         $categories = implode(',', $_POST['checkedCategories']);
         #print_r($categories);
         $categories = "'" . str_replace(",", "','", $categories) . "'";
         $sql .= $categories;
-        $sql .= ")";
+        $sql .= ") AND sellerID=$sellerID";
+      }
+      else {
+        $sql .= " WHERE sellerID=$sellerID";
       }
       $resultset = mysqli_query($conn, $sql) or die("database error:" . mysqli_error($conn));
       while ($record = mysqli_fetch_assoc($resultset)) {

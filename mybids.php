@@ -33,11 +33,11 @@
     <div id="productCards" class="row">
       <?php
       $sql = "SELECT a.auctionID, a.title, a.descript, a.endDate, a.startPrice, a.reservePrice, c.categoryName, MAX(b.bidAmount) AS YourHighestBid  
-			  FROM auctions a 
-			  JOIN bids b ON a.auctionID = b.auctionID 
-			  JOIN categories c ON a.categoryID = c.categoryID 
+			  FROM Auctions a 
+			  JOIN Bids b ON a.auctionID = b.auctionID 
+			  JOIN Categories c ON a.categoryID = c.categoryID 
 			  WHERE b.buyerID = $buyer_id AND a.auctionID IN 
-			  (SELECT DISTINCT a.auctionID FROM auctions a JOIN bids b ON a.auctionID = b.auctionID WHERE b.buyerID = $buyer_id)
+			  (SELECT DISTINCT a.auctionID FROM Auctions a JOIN Bids b ON a.auctionID = b.auctionID WHERE b.buyerID = $buyer_id)
 			  GROUP BY a.auctionID, a.title, a.descript, a.endDate, a.startPrice, a.reservePrice, c.categoryName;";
       $resultset = mysqli_query($conn, $sql) or die("database error:" . mysqli_error($conn));
 	  // Check if the user has placed any bids
@@ -72,9 +72,9 @@
 					b.bidAmount,
 					b.buyerID,
 					bu.username
-				FROM auctions a
-				JOIN bids b ON a.auctionID = b.auctionID
-				JOIN buyers bu ON b.buyerID = bu.buyerID
+				FROM Auctions a
+				JOIN Bids b ON a.auctionID = b.auctionID
+				JOIN Buyers bu ON b.buyerID = bu.buyerID
 				WHERE a.auctionID = $productID AND b.bidAmount = (SELECT MAX(bidAmount) FROM bids WHERE auctionID = $productID);";
 		$result = $conn->query($sql2)->fetch_row() ?? false;
 		$username = $result[4];
