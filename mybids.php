@@ -11,28 +11,21 @@
   if ($conn->connect_error) {
 	die("Connection failed: " . $conn->connect_error);
   }
-   
-  // Check if user is logged in
+  
+  $indexURL = 'http://' . $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF']) . '/index.php';
+  // Check if user is logged in and redirect if not
   if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
 	$buyer_id = $_SESSION['userID'];
 	$username = $_SESSION['username'];
-  }
-  
-  // Collect user type
-  $query_type_buyer = "SELECT 1 FROM Buyers WHERE username = '".$username."'";
-  $result_buyer = mysqli_query($conn, $query_type_buyer);
-  $query_type_seller = "SELECT 1 FROM Sellers WHERE username = '".$username."'";
-  $result_seller = mysqli_query($conn, $query_type_seller);
-  if (mysqli_fetch_array($result_buyer)[0] == '1') {
-	$type = 'buyer';
+	$usertype = $_SESSION['account_type'];
   }
   else {
-	$type = 'seller';
+	header('Location: ' . $indexURL);
   }
   
-  if ($type == "seller") {
-    header("refresh:0; url=index.php");
-	die();
+  // Check if the user type is seller and redirect if yes
+  if ($usertype == "seller") {
+	header('Location: ' . $indexURL);
   }
   
 ?>

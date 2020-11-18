@@ -2,38 +2,28 @@
 <?php require("utilities.php")?>
 
 <?php
-// This page is for showing a user's watched auctions.
+  // This page is for showing a user's watched auctions.
    
-// Create connection
-require_once('private/database_credentials.php');
-$conn = mysqli_connect(host, username, password, database);
-// Check connection
-if ($conn->connect_error) {
-die("Connection failed: " . $conn->connect_error);
-}
+  // Create connection
+  require_once('private/database_credentials.php');
+  $conn = mysqli_connect(host, username, password, database);
+  // Check connection
+  if ($conn->connect_error) {
+  die("Connection failed: " . $conn->connect_error);
+  }
 
-// Check if user is logged in
-if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
-$buyer_id = $_SESSION['userID'];
-$username = $_SESSION['username'];
-}
-
-// Collect user type
-$query_type_buyer = "SELECT 1 FROM Buyers WHERE username = '".$username."'";
-$result_buyer = mysqli_query($conn, $query_type_buyer);
-$query_type_seller = "SELECT 1 FROM Sellers WHERE username = '".$username."'";
-$result_seller = mysqli_query($conn, $query_type_seller);
-if (mysqli_fetch_array($result_buyer)[0] == '1') {
-$type = 'buyer';
-}
-else {
-$type = 'seller';
-}
-
-if ($type == "seller") {
-header("refresh:0; url=index.php");
-die();
-}
+  // Check if user is logged in
+  if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
+  $buyer_id = $_SESSION['userID'];
+  $username = $_SESSION['username'];
+  $usertype = $_SESSION['account_type'];
+  }
+  
+  // If user type is not buyer, redirect
+  if ($usertype == "seller") {
+	$indexURL = 'http://' . $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF']) . '/index.php';
+	header('Location: ' . $indexURL);
+  }
 ?>
 
 <div class="container">

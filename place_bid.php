@@ -11,24 +11,24 @@
 	die("Connection failed: " . $conn->connect_error);
   }
   
-  // Determine values to enter into the bids table
-  $now = new DateTime();
-  $bid_date = $now->format("Y-m-d H:i:s");
-  
-  // Check if bid is posted
+  // Check if bid is posted and redirect if not
+  $indexURL = 'http://' . $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF']) . '/index.php';
   if (!isset($_POST['bid'])) {
-	header("refresh:0; url=index.php");
-	die();
+	header('Location: ' . $indexURL);
   }
-  $bid_amount = round($_POST['bid'], 2);
-
-  $auction_id = $_GET['auctionID'];
-  // Check if user is logged in
-  if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
+  
+  // Check if user is logged in and is a buyer, redirect if not
+  if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true && $_SESSION['account_type'] == 'buyer') {
 	$buyer_id = $_SESSION['userID'];
   } else {
-	$buyer_id = null;
+	header('Location: ' . $indexURL);
   }
+  
+  // If user is logged in and bid is posted, continue to insert the bid
+  $now = new DateTime();
+  $bid_date = $now->format("Y-m-d H:i:s");
+  $bid_amount = round($_POST['bid'], 2);
+  $auction_id = $_GET['auctionID'];
 
   // Insert the records into the database
   // Not validating bid here since the validation is built into the server with the function bid_check

@@ -18,22 +18,10 @@
     $has_session = true;
 	$buyer_id = $_SESSION['userID'];
 	$username = $_SESSION['username'];
+	$usertype = $_SESSION['account_type'];
   } else {
     $has_session = false;
   }
-
-  // Collect user type
-  $query_type_buyer = "SELECT 1 FROM Buyers WHERE username = '".$username."'";
-  $result_buyer = mysqli_query($conn, $query_type_buyer);
-  $query_type_seller = "SELECT 1 FROM Sellers WHERE username = '".$username."'";
-  $result_seller = mysqli_query($conn, $query_type_seller);
-  if (mysqli_fetch_array($result_buyer)[0] == '1') {
-	$type = 'buyer';
-  }
-  else {
-	$type = 'seller';
-  }
-
 
   // Get auctionID from the URL
   $auction_id = $_GET['auctionID'];
@@ -131,13 +119,13 @@
   
   <div class="col-sm-4 align-self-center"> <!-- Right col -->
 <?php  if ($now < $end_time): ?>
-    <div id="watch_nowatch" <?php if (($has_session && $watching) || (!$has_session) || ($type == "seller")) echo('style="display: none"');?> >
+    <div id="watch_nowatch" <?php if (($has_session && $watching) || (!$has_session) || ($usertype == "seller")) echo('style="display: none"');?> >
       <button type="button" class="btn btn-outline-secondary btn-sm" onclick="addToWatchlist()">+ Add to watchlist</button>	
 	  <button type="button" class="btn btn-outline-secondary btn-sm" disabled>Number of watchers: <?php echo $num_watchers ?></button>
     </div>
 <?php endif /* Print nothing otherwise */ ?>
 
-    <div id="watch_watching" <?php if (!$has_session || !$watching || ($type == "seller") ) echo('style="display: none"');?> >
+    <div id="watch_watching" <?php if (!$has_session || !$watching || ($usertype == "seller") ) echo('style="display: none"');?> >
       <button type="button" class="btn btn-success btn-sm" disabled>Watching</button>
       <button type="button" class="btn btn-danger btn-sm" onclick="removeFromWatchlist()">Remove watch</button>
 	  <button type="button" class="btn btn-outline-secondary btn-sm" disabled>Number of watchers: <?php echo $num_watchers ?></button>
@@ -166,7 +154,7 @@
 		<p>The item was sold for £<?php echo(number_format($current_price, 2)) ?>.</p>
 		<div class="card">
 			<h5 class="card-header">
-			<a class="collapsed d-block" data-toggle="collapse" href="#" aria-expanded="true" aria-controls="bidsTable" id="bids">Number of bids: <?php echo(number_format($num_bids, 0)) ?>
+			<a href="#" id="bids" onclick="toggleElement('#bidsTable')">Number of bids: <?php echo(number_format($num_bids, 0)) ?>
 			</a></h5>
 			<div id="bidsTable" class="collapse" aria-labelledby="bids">
 				<div class="card-body">
@@ -180,7 +168,7 @@
 		<p>The reserve price was not reached and the item was not sold.</p>
 		<div class="card">
 			<h5 class="card-header">
-			<a class="collapsed d-block" data-toggle="collapse" href="#" aria-expanded="true" aria-controls="bidsTable" id="bids">Number of bids: <?php echo(number_format($num_bids, 0)) ?>
+			<a href="#" id="bids" onclick="toggleElement('#bidsTable')">Number of bids: <?php echo(number_format($num_bids, 0)) ?>
 			</a></h5>
 			<div id="bidsTable" class="collapse" aria-labelledby="bids">
 				<div class="card-body">
@@ -214,7 +202,7 @@
 		
     <!-- Bidding form, shown only to buyers -->
 		<?php if ($has_session == true): ?>
-		<form method="POST" onsubmit="return checkBidSubmit()" action="place_bid.php?auctionID=<?php echo $auction_id ?>" <?php if ($type == "seller") echo('style="display: none"');?>>
+		<form method="POST" onsubmit="return checkBidSubmit()" action="place_bid.php?auctionID=<?php echo $auction_id ?>" <?php if ($usertype == "seller") echo('style="display: none"');?>>
 		  <div class="input-group">
 			<div class="input-group-prepend">
 			  <span class="input-group-text">£</span>
