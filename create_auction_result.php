@@ -8,40 +8,33 @@ include_once("header.php")?>
 
 // This function takes the form data and adds the new auction to the database.
 
-/* TODO #1: Connect to MySQL database (perhaps by requiring a file that
-            already does this). */
+// Connect to MySQL database 
 
-            require_once('private/database_credentials.php');
+require_once('private/database_credentials.php');
             
-            $conn = mysqli_connect(host, username, password, database)or die ('Error connecting to MySQL server.' . mysql_error());
+$conn = mysqli_connect(host, username, password, database)or die ('Error connecting to MySQL server.' . mysql_error());
 
 
-/* TODO #2: Extract form data into variables. Because the form was a 'post'
-form, its data can be accessed via $POST['auctionTitle'], $POST['auctionDetails'], etc. Perform checking on the data to
-make sure it can be inserted into the database. If there is an
-issue, give some semi-helpful feedback to user. */
+// Contains functions for validating user-inputted form data and preventing SQL injection attacks
+require_once('php/create_auction_form_validation.php');
 
-
-
-$title=$_POST['title'];           
-$descript=$_POST['Details'];
+//Functions evaluate to boolean false if there's an issue, so queries using them below will fail (since data types in the database are non-boolean)
+$title=validate_title($conn, $_POST["title"]);           
+$descript=validate_descript($conn,$_POST['Details']);
 
 $category=$_POST['Category'];
 
-$startingPrice=$_POST['startingPrice'];
+$startingPrice=validate_price($conn,$_POST['startingPrice']);
 
-$reservePrice=$_POST['ReservePrice'];
-$minIncrement=$_POST['minIncrement'];
+$reservePrice=validate_price($conn,$_POST['ReservePrice']);
+$minIncrement=validate_minIncrement($conn,$_POST['minIncrement']);
 $createDate=date("Y-m-d H:i:s");
-$startDate=$_POST['Startdate'];
-$endDate=$_POST['Enddate'];
+$startDate=validate_date($conn,$_POST['Startdate']);
+$endDate=validate_date($conn,$_POST['Enddate']);
 
 $sellerID=$_SESSION['userID'];
 
-// /* TODO #3: If everything looks good, make the appropriate call to insert
-//             data into the database. */
-            
-
+//Assign default values to optional value not entered by the user
 if(empty($_POST['ReservePrice'])){ 
   $reservePrice = $startingPrice;
 }else{
@@ -61,36 +54,20 @@ if(empty($_POST['Startdate'])){
 }
 
 
-
-
-
-if(!$title ||!$descript || !$category || !$startingPrice   || !$reservePrice  || !$minIncrement  || !$createDate || !$startDate || !$endDate){
-    echo('Error:There is lack of some data');
-    exit;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
+//Convert the category name entered by the user into category ID that needs to be inserted
 $query1 = "SELECT categoryID FROM Categories WHERE categoryName = '$category'";
 $result1 = mysqli_query($conn,$query1);
 $row1 = mysqli_fetch_row($result1);
 $categoryID = $row1[0];
+if (!$result1) {
+  echo "Select category unsuccessful. Error:". $sql . "<br>" . mysqli_error($conn);
+  mysqli_close($connection);
+} 
 
 
 
 
-
-
+//Inserting required fields
 $query3="INSERT INTO Auctions(title, descript, createDate, startDate, endDate, startPrice, reservePrice, minIncrement, sellerID,categoryID) VALUES
 ('$title','$descript','$createDate','$startDate','$endDate','$startingPrice','$reservePrice','$minIncrement','$sellerID','$categoryID') ";
 
@@ -99,6 +76,7 @@ if (mysqli_query($conn, $query3)) {
   echo "Insert successfully!";
 } else {
   echo "Error: " . $sql . "<br>" . mysqli_error($conn);
+  mysqli_close($conn);
 }
 
 
