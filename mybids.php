@@ -102,13 +102,13 @@
 			
 			// Otherwise, the reserve price was reached
 			else if ($result[1] >= $result[2]) {
-			$auctionOutcome = 'Winning bid: £' . $result[1];
+			$auctionOutcome = 'Winning bid: £' . $result[1] . ".";
 				// Check who won the auction
 				if ($buyer_id == $result[3]) {
 					$leadingBidder = "Congrats " . $usernameHighestBidder . "! You won the auction!";
 				}
 				else {
-					$leadingBidder = "Auction won by: " . $usernameHighestBidder;
+					$leadingBidder = "Auction won by: " . $usernameHighestBidder . ".";
 				}
 			}
 		}
@@ -121,8 +121,8 @@
 			}
 			// There are bids - show the highest
 			else {
-				$auctionOutcome = "Current highest bid: £" . $result[1];
-				$leadingBidder = "Highest bidder: " . $usernameHighestBidder;
+				$auctionOutcome = "Current highest bid: £" . $result[1] . ".";
+				$leadingBidder = "Highest bidder: " . $usernameHighestBidder . ".";
 			}
 		}    	
 			
@@ -133,7 +133,7 @@
 				ORDER BY bidDate ";
 		$result = $conn->query($sql3) ?? false;
 		  
-		$tableBids = '<table id="bidsTable" border="1" cellspacing="1" cellpadding="4">
+		$tableBids = '<table id="bidsTable' . $productID  . '" border="1" cellspacing="1" cellpadding="4" class="collapse">
 				<tr>
 				<th>Bid Date</th>
 				<th>Username</th> 
@@ -157,8 +157,8 @@
 		  </div>
 		  
 		  <div class="card-body">
-			<p class="card-text">Your bids: <?php echo $tableBids ?></p>
-			<p class="card-text"><?php echo $productTimeLeft?> <?php echo $auctionOutcome ?></p>
+			<p class="card-text"><a href="#" id="bids" onclick="toggleElement('#bidsTable<?php echo $productID ?>')">Your bids <?php echo $tableBids ?></a></p>
+			<p class="card-text"><?php echo $productTimeLeft?> <br> <?php echo $auctionOutcome ?></p>
 			<p class="card-text"><b><?php echo $leadingBidder ?></b></p>
           </div>
 		  
@@ -176,3 +176,12 @@
 
 <?php $conn->close(); ?>
 <?php include_once("footer.php")?>
+
+
+<script>
+// Function to show and hide number of bids
+function toggleElement(element) {
+var element = $(element);
+element.toggle();
+}
+</script>

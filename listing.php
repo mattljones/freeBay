@@ -203,9 +203,9 @@
 	
 		<div class="card">
 			<h5 class="card-header">
-			<a class="collapsed d-block" data-toggle="collapse" href="#" aria-expanded="true" aria-controls="bidsTable" id="bids">Number of bids: <?php echo(number_format($num_bids, 0)) ?>
+			<a href="#" id="bids" onclick="toggleElement('#bidsTable')">Number of bids: <?php echo(number_format($num_bids, 0)) ?>
 			</a></h5>
-			<div id="bidsTable" class="collapse" aria-labelledby="bids">
+			<div id="bidsTable" class="collapse">
 				<div class="card-body">
 				<?php echo $table ?>
 				</div>
@@ -335,12 +335,9 @@ function removeFromWatchlist(button) {
 </script>
 
 <script>
-// Script to show and hide number of bids
-var bids = $('#bids');
-var bidsTable = $('#bidsTable');
-bidsTable.hide();
-bids.on('click', function() {
-	bidsTable.toggle();
-  }
-)
+// Function to toggle an element
+function toggleElement(element) {
+var element = $(element);
+element.toggle();
+}
 </script>
