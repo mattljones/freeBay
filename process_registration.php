@@ -13,7 +13,7 @@ if (!$connection) {
     // Don't call die() since we still need to include the footer for login modal functionality
 }
 
-// Contains functions for validating user-inputted form data and preventing SQL injection attacks
+// Contains functions for validating user-inputted registration form data and preventing SQL injection attacks
 require_once('php/login_register_form_validation.php'); 
 
 // Functions evaluate to boolean false if there's an issue, so queries using them below will fail (since data types in the database are non-boolean)

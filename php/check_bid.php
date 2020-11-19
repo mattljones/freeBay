@@ -12,7 +12,7 @@ function check_bid($conn, $bid, $auctionID) {
         die();
     }
     else {
-        $query = "SELECT bid_check('$bid', '$auctionID')";
+        $query = "SELECT bid_check('$bid', '$auctionID')"; // using bid_check() function stored in the database
         $result = mysqli_query($conn, $query);
         $outcome = mysqli_fetch_array($result)[0];
 		if ($outcome == 'valid') {

@@ -13,7 +13,7 @@ function check_unique($conn, $username) {
         die();
     }
     else {
-        $query = "SELECT username_check('$username')";
+        $query = "SELECT username_check('$username')"; // using username_check() function stored in the database
         $result = mysqli_query($conn, $query);
         if (!$result) {
             echo 'failure';

@@ -1,6 +1,6 @@
 <?php 
 
-// Functions for validating user-inputted form data and preventing SQL injection attacks
+// Functions for validating user-inputted login/registration form data and preventing SQL injection attacks
 
 function validate_user_type($conn, $input) {
     if (preg_match('/^(buyer|seller)$/', $input)) {
