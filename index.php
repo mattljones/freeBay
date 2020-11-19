@@ -195,20 +195,21 @@
         $sql .= $categories;
         $sql .= ")";
       }
+      $currentTime = new DateTime();
+      $currentTime = $currentTime->format('Y-m-d H:i:s');
       if (isset($_POST['checkedStatus'])) {
-        $currentTime = new DateTime();
         if (in_array("checkActive", $_POST['checkedStatus'])) {
-          $sql .= " AND '2020-11-19 17:55:00' < endDate";
+          $sql .= " AND '$currentTime' < endDate";
         }
         if (in_array("checkSoldCompleted", $_POST['checkedStatus'])) {
-          $sql .= " AND '2020-11-19 17:55:00' > endDate AND (maxBid >= reservePrice AND noOfBidders > 0)";
+          $sql .= " AND '$currentTime' > endDate AND (maxBid >= reservePrice AND noOfBidders > 0)";
         }
         if (in_array("checkUnsoldCompleted", $_POST['checkedStatus'])) {
-          $sql .= " AND '2020-11-19 17:55:00' > endDate AND (maxBid < reservePrice OR noOfBidders = 0)";
+          $sql .= " AND '$currentTime' > endDate AND (maxBid < reservePrice OR noOfBidders = 0)";
         }
       }
       else {
-        $sql .= " AND '2020-11-19 17:55:00' < endDate";
+        $sql .= " AND '$currentTime' < endDate";
       }
       if (isset($_POST['checkedOrder'])) {
         $sql .= " ORDER BY ";
