@@ -328,7 +328,7 @@
           toastText = "No auctions match those filters";
         }
         else {
-          toastText = `The searhc has found ${numResults} results`;
+          toastText = `The search has found ${numResults} results`;
         }
         let body = document.getElementById("messageHTMLToast");
         body.innerHTML = toastText;
