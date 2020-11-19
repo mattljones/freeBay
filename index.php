@@ -321,8 +321,17 @@
 <script>
 
       $(document).ready(function(){
-        let body = document.getElementById("messageHTMLToast")
-        body.innerHTML = "The search has found <?php echo $num_rows?> results."
+        let numResults = <?php echo $num_rows?>;
+        numResults = parseInt(numResults)
+        let toastText = "";
+        if (numResults === 0) {
+          toastText = "No auctions match those filters";
+        }
+        else {
+          toastText = `The searhc has found ${numResults} results`;
+        }
+        let body = document.getElementById("messageHTMLToast");
+        body.innerHTML = toastText;
         $("#messageToast").toast('show');
       });
 
