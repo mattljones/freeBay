@@ -33,15 +33,28 @@
 ?>
 <!--    <option value=></option>
         </select> -->
-
+<div aria-live="polite" aria-atomic="true" style="position: relative; min-height: 25px;">
+  <div class="toast hide" id="messageToast" style="position: absolute; top: 0; right: 0;" data-autohide="false">
+    <div class="toast-header">
+      <img src="assets/favicon.png" class="rounded mr-2" alt="fB">
+      <strong class="mr-auto">Search Results</strong>
+      <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="toast-body" id="messageHTMLToast">
+      The search has found <?php echo $num_rows?> results.
+    </div>
+  </div>
+</div>
 <div class="row" style="margin:0;">
   <div class="col-md-2">
     <h1>Filters</h1>
     <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="POST">
       <button id="checkAll" class="btn btn-outline-primary" style="margin-top: 5%;">Reset filters</button>
-    <hr>
-    <h2>Status</h2>
-    <?php
+      <hr>
+      <h2>Status</h2>
+      <?php
       $activeChecked1 = "checked";
       $soldCompletedChecked = "";
       $unSoldCompletedChecked = "";
@@ -62,26 +75,26 @@
           $unSoldCompletedChecked = "checked";
         }
       }
-    ?>
-    <div class="form-group" style="margin-bottom: 1rem">
-    <div class="form-check">
-        <input class="form-check-input" type="radio" value="checkActive" id="showActive1" name="checkedStatus[]" <?php echo $activeChecked1 ?> >
-        <label class="form-check-label" for="showActive1">Show Active Auctions</label>
+      ?>
+      <div class="form-group" style="margin-bottom: 1rem">
+        <div class="form-check">
+          <input class="form-check-input" type="radio" value="checkActive" id="showActive1" name="checkedStatus[]" <?php echo $activeChecked1 ?>>
+          <label class="form-check-label" for="showActive1">Show Active Auctions</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" value="checkSoldCompleted" id="showCompleted1" name="checkedStatus[]" <?php echo $soldCompletedChecked ?>>
+          <label class="form-check-label" for="showCompleted1">Show Sold & Completed Auctions</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" value="checkUnsoldCompleted" id="showCompleted2" name="checkedStatus[]" <?php echo $unSoldCompletedChecked ?>>
+          <label class="form-check-label" for="showCompleted2">Show Unsold & Completed Auctions</label>
+        </div>
+        <button type="submit" class="btn btn-outline-primary" style="margin-left: 0.5%">Apply</button>
       </div>
-      <div class="form-check">
-        <input class="form-check-input" type="radio" value="checkSoldCompleted" id="showCompleted1" name="checkedStatus[]" <?php echo $soldCompletedChecked ?> >
-        <label class="form-check-label" for="showCompleted1">Show Sold & Completed Auctions</label>
-      </div>
-      <div class="form-check">
-        <input class="form-check-input" type="radio" value="checkUnsoldCompleted" id="showCompleted2" name="checkedStatus[]" <?php echo $unSoldCompletedChecked ?> >
-        <label class="form-check-label" for="showCompleted2">Show Unsold & Completed Auctions</label>
-      </div>
-      <button type="submit" class="btn btn-outline-primary" style="margin-left: 0.5%">Apply</button>
-    </div>  
-    <hr>
-    <h2>Categories</h2>
-    <div class="list-group">
-      <div id="categories-filter">
+      <hr>
+      <h2>Categories</h2>
+      <div class="list-group">
+        <div id="categories-filter">
           <?php
           require_once('private/database_credentials.php');
           $conn = mysqli_connect(host, username, password, database) or die("Connection failed: " . mysqli_connect_error());
@@ -111,13 +124,13 @@
           }
           ?>
           <button type="submit" class="btn btn-outline-primary" style="margin-top: 5%;">Apply</button>
-        <!--</form> -->
+          <!--</form> -->
+        </div>
       </div>
-    </div>
-    <hr>
-    <h2>Order by</h2>
-    <hr>
-    <?php
+      <hr>
+      <h2>Order by</h2>
+      <hr>
+      <?php
       $priceChecked1 = "";
       $priceChecked2 = "";
       $bidsChecked1 = "";
@@ -128,52 +141,52 @@
         if (in_array("checkLowPrice", $_POST['checkedOrder'])) {
           $priceChecked1 = "checked";
         }
-        if(in_array("checkLowNoBids", $_POST['checkedOrder'])) {
+        if (in_array("checkLowNoBids", $_POST['checkedOrder'])) {
           $bidsChecked1 = "checked";
         }
-        if(in_array("checkLowNoWatchers", $_POST['checkedOrder'])) {
+        if (in_array("checkLowNoWatchers", $_POST['checkedOrder'])) {
           $watchersChecked1 = "checked";
         }
         if (in_array("checkHighPrice", $_POST['checkedOrder'])) {
           $priceChecked2 = "checked";
         }
-        if(in_array("checkHighNoBids", $_POST['checkedOrder'])) {
+        if (in_array("checkHighNoBids", $_POST['checkedOrder'])) {
           $bidsChecked2 = "checked";
         }
-        if(in_array("checkHighNoWatchers", $_POST['checkedOrder'])) {
+        if (in_array("checkHighNoWatchers", $_POST['checkedOrder'])) {
           $watchersChecked2 = "checked";
         }
       }
-    ?>
-    <div class="form-group" style="margin-bottom: 1rem">
+      ?>
+      <div class="form-group" style="margin-bottom: 1rem">
         <div class="form-check">
-          <input class="form-check-input" type="radio" value="checkLowPrice" id="sortPriceCheck1" name="checkedOrder[]" <?php echo $priceChecked1 ?> >
+          <input class="form-check-input" type="radio" value="checkLowPrice" id="sortPriceCheck1" name="checkedOrder[]" <?php echo $priceChecked1 ?>>
           <label class="form-check-label" for="sortPriceCheck1">Sort by Lowest Price</label>
         </div>
         <div class="form-check">
-          <input class="form-check-input" type="radio" value="checkHighPrice" id="sortPriceCheck2" name="checkedOrder[]" <?php echo $priceChecked2 ?> >
+          <input class="form-check-input" type="radio" value="checkHighPrice" id="sortPriceCheck2" name="checkedOrder[]" <?php echo $priceChecked2 ?>>
           <label class="form-check-label" for="sortPriceCheck2">Sort by Highest Price</label>
         </div>
         <hr>
         <div class="form-check">
-          <input class="form-check-input" type="radio" value="checkLowNoBids" id="sortNoBidsCheck1" name="checkedOrder[]" <?php echo $bidsChecked1 ?> >
+          <input class="form-check-input" type="radio" value="checkLowNoBids" id="sortNoBidsCheck1" name="checkedOrder[]" <?php echo $bidsChecked1 ?>>
           <label class="form-check-label" for="sortNoBidsCheck1">Sort by Lowest Number of Bidders</label>
         </div>
         <div class="form-check">
-          <input class="form-check-input" type="radio" value="checkHighNoBids" id="sortNoBidsCheck2" name="checkedOrder[]" <?php echo $bidsChecked2 ?> >
+          <input class="form-check-input" type="radio" value="checkHighNoBids" id="sortNoBidsCheck2" name="checkedOrder[]" <?php echo $bidsChecked2 ?>>
           <label class="form-check-label" for="sortNoBidsCheck2">Sort by Highest Number of Bidders</label>
         </div>
         <hr>
         <div class="form-check">
-          <input class="form-check-input" type="radio" value="checkLowNoWatchers" id="sortNoWatchersCheck1" name="checkedOrder[]" <?php echo $watchersChecked1 ?> >
+          <input class="form-check-input" type="radio" value="checkLowNoWatchers" id="sortNoWatchersCheck1" name="checkedOrder[]" <?php echo $watchersChecked1 ?>>
           <label class="form-check-label" for="sortNoWatchersCheck1">Sort by Lowest Number of Watchers</label>
         </div>
         <div class="form-check">
-          <input class="form-check-input" type="radio" value="checkHighNoWatchers" id="sortNoWatchersCheck2" name="checkedOrder[]" <?php echo $watchersChecked2 ?> >
+          <input class="form-check-input" type="radio" value="checkHighNoWatchers" id="sortNoWatchersCheck2" name="checkedOrder[]" <?php echo $watchersChecked2 ?>>
           <label class="form-check-label" for="sortNoWatchersCheck2">Sort by Highest Number of Watchers</label>
         </div>
-      <button type="submit" class="btn btn-outline-primary" style="margin-left: 0.5%">Apply</button>
-    </div>
+        <button type="submit" class="btn btn-outline-primary" style="margin-left: 0.5%">Apply</button>
+      </div>
     </form>
 
   </div>
@@ -207,8 +220,7 @@
         if (in_array("checkUnsoldCompleted", $_POST['checkedStatus'])) {
           $sql .= " AND '$currentTime' > endDate AND (maxBid < reservePrice OR noOfBidders = 0)";
         }
-      }
-      else {
+      } else {
         $sql .= " AND '$currentTime' < endDate";
       }
       if (isset($_POST['checkedOrder'])) {
@@ -216,23 +228,24 @@
         if (in_array("checkLowPrice", $_POST['checkedOrder'])) {
           $sql .= "maxBid";
         }
-        if(in_array("checkLowNoBids", $_POST['checkedOrder'])) {
+        if (in_array("checkLowNoBids", $_POST['checkedOrder'])) {
           $sql .= "noOfBidders";
         }
-        if(in_array("checkLowNoWatchers", $_POST['checkedOrder'])) {
+        if (in_array("checkLowNoWatchers", $_POST['checkedOrder'])) {
           $sql .= "noOfWatching";
         }
         if (in_array("checkHighPrice", $_POST['checkedOrder'])) {
           $sql .= "maxBid DESC";
         }
-        if(in_array("checkHighNoBids", $_POST['checkedOrder'])) {
+        if (in_array("checkHighNoBids", $_POST['checkedOrder'])) {
           $sql .= "noOfBidders DESC";
         }
-        if(in_array("checkHighNoWatchers", $_POST['checkedOrder'])) {
+        if (in_array("checkHighNoWatchers", $_POST['checkedOrder'])) {
           $sql .= "noOfWatching DESC";
         }
       }
       $resultset = mysqli_query($conn, $sql) or die("database error:" . mysqli_error($conn));
+      $num_rows = mysqli_num_rows($resultset);
       while ($record = mysqli_fetch_assoc($resultset)) {
         $productAuctionID = $record['auctionID'];;
         $sql2 = "SELECT max(bidAmount) as currentPrice, count(bidID) FROM Bids WHERE auctionID = $productAuctionID ";
@@ -263,11 +276,10 @@
           $productTimeLeft = ' Auction will end in ' . display_time_remaining($time_to_end) . '';
         } else {
           $productTimeLeft = "Auction Ended";
-          if (($productCurrentPrice < $productReservePrice) or ($productBidders == 0))  {
+          if (($productCurrentPrice < $productReservePrice) or ($productBidders == 0)) {
             #Product didnt'sell so format of card will be red
             $cardStatusFormat = "border-danger mb-3";
-          }
-          else {
+          } else {
             #Product did sell so will become green
             $cardStatusFormat = "border-success mb-3";
           }
@@ -279,7 +291,7 @@
         #}
 
       ?>
-        <div class="card <?php echo $cardStatusFormat?>" style="width: 18rem; margin-left: 0.5%; margin-right: 0.5%; margin-top: 0.5%; margin-bottom: 0.5%;">
+        <div class="card <?php echo $cardStatusFormat ?>" style="width: 18rem; margin-left: 0.5%; margin-right: 0.5%; margin-top: 0.5%; margin-bottom: 0.5%;">
           <!--<img class="card-img-top" src="data:image/jpg;charset=utf8;base64,<?php echo base64_encode($record['image']); ?>" /> -->
           <div class="card-body">
             <h5 class="card-title"><?php echo $productTitle ?></h5>
@@ -290,7 +302,7 @@
             <p class="card-text"><?php echo $productTimeLeft ?></p>
             <!-- <a href="listing.php?auctionID=<?= $productID ?>" type="submit" class="btn btn-outline-primary text-center">View Item</a> -->
           </div>
-          <div class="card-footer <?php echo $cardStatusFormat?>">
+          <div class="card-footer <?php echo $cardStatusFormat ?>">
             <div class="buy d-flex justify-content-between align-items-center">
               <div class="price text-success">
                 <h5 class="mt-4">£<?= $productCurrentPrice ?></h5>
@@ -304,42 +316,47 @@
     </div>
   </div>
   </form>
+</div>
 
+<script>
 
-    </body>
+      $(document).ready(function(){
+        let body = document.getElementById("messageHTMLToast")
+        body.innerHTML = "The search has found <?php echo $num_rows?> results."
+        $("#messageToast").toast('show');
+      });
 
-    <script>
-      function uncheckAll() {
-        $("input[type='checkbox']:checked").prop("checked", false)
-        $("input[type='radio']:checked").prop("checked", false)
+    function uncheckAll() {
+      $("input[type='checkbox']:checked").prop("checked", false)
+      $("input[type='radio']:checked").prop("checked", false)
+    }
+    $('#checkAll').on('click', uncheckAll)
+
+    $(document).ready(function() {
+      $('#searchbox').on("keyup", function() {
+        var value = $(this).val().toLowerCase();
+        $(".card").filter(function() {
+          $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        });
+      });
+    });
+
+    $(document).ready(function() {
+      $('#update_indication_id').on("change", function() {
+        var value = $(this).val().toLowerCase();
+        $(".card").filter(function() {
+          $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        });
+      });
+    });
+
+    $.each($('*'), function() {
+      if ($(this).width() > $('body').width()) {
+        console.log("Wide Element: ", $(this), "Width: ",
+          $(this).width());
       }
-      $('#checkAll').on('click', uncheckAll)
+    });
+  </script>
 
-      $(document).ready(function() {
-        $('#searchbox').on("keyup", function() {
-          var value = $(this).val().toLowerCase();
-          $(".card").filter(function() {
-            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-          });
-        });
-      });
 
-      $(document).ready(function() {
-        $('#update_indication_id').on("change", function() {
-          var value = $(this).val().toLowerCase();
-          $(".card").filter(function() {
-            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-          });
-        });
-      });
-
-      $.each($('*'), function() {
-        if ($(this).width() > $('body').width()) {
-          console.log("Wide Element: ", $(this), "Width: ",
-            $(this).width());
-        }
-      });
-    </script>
-  </div>
-
-  <?php include_once("footer.php") ?>
+<?php include_once("footer.php") ?>
