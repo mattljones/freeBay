@@ -207,7 +207,7 @@
 			<div class="input-group-prepend">
 			  <span class="input-group-text">£</span>
 			</div>
-			<input type="number" class="form-control" id="bid" name="bid" min=<?php echo floatval($min_bid); ?> required>
+			<input type="number" class="form-control" id="bid" name="bid" min=<?php echo $min_bid; ?> step="0.01" required>
 			<div class="input-group-append">
 			  <span class="input-group-text">Minimum bid: <?php echo "£" . floatval($min_bid) ?></span>
 			</div>
