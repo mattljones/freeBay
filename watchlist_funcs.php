@@ -2,6 +2,7 @@
 <?php require("utilities.php")?>
 
 <?php
+
 // Check if the data was posted correctly
 if (!isset($_POST['functionname']) || !isset($_POST['arguments'])) {
   return;
@@ -39,7 +40,7 @@ if ($_POST['functionname'] == "add_to_watchlist") {
 }
 else if ($_POST['functionname'] == "remove_from_watchlist") {
   // Update database and return success/failure.
-  $sql = "DELETE FROM Watching WHERE auctionID = $auction_id AND buyerID = $buyer_id;";
+  $sql = "DELETE FROM Watching WHERE auctionID = '$auction_id' AND buyerID = '$buyer_id';";
   if ($conn->query($sql) === TRUE) {
   	$res = "success";
   } else {

@@ -12,7 +12,6 @@
 	die("Connection failed: " . $conn->connect_error);
   }
   
-  $indexURL = 'http://' . $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF']) . '/index.php';
   // Check if user is logged in and redirect if not
   if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
 	$buyer_id = $_SESSION['userID'];
@@ -20,12 +19,12 @@
 	$usertype = $_SESSION['account_type'];
   }
   else {
-	header('Location: ' . $indexURL);
+	redirect_index();
   }
   
   // Check if the user type is seller and redirect if yes
   if ($usertype == "seller") {
-	header('Location: ' . $indexURL);
+	redirect_index();
   }
   
 ?>
@@ -33,25 +32,26 @@
 <div class="container">
 
 <div class="row">
-	<div class="col-sm-10">
+	<div class="col-sm-11">
 		<h2 class="my-3">My Bids</h2>
 		<hr class="rounded">
 	</div>
 </div>
 
 <div class="row">
-  <div class="col-sm-10">
+  <div class="col-sm-11">
     <div id="productCards" class="row">
       <?php
-      $sql = "SELECT a.auctionID, a.title, a.endDate, c.categoryName, MAX(b.bidAmount) AS YourHighestBid  
+      $sql_1 = "SELECT a.auctionID, s.username, a.title, a.endDate, c.categoryName, MAX(b.bidAmount) AS YourHighestBid  
 			  FROM Auctions a 
 			  JOIN Bids b ON a.auctionID = b.auctionID 
 			  JOIN Categories c ON a.categoryID = c.categoryID
 			  JOIN Buyers b2 ON b2.buyerID = b.buyerID
+			  JOIN Sellers s ON s.sellerID = a.sellerID
 			  WHERE b.buyerID = '$buyer_id' AND b2.username = '$username' AND a.auctionID IN 
 			  (SELECT DISTINCT a.auctionID FROM Auctions a JOIN Bids b ON a.auctionID = b.auctionID WHERE b.buyerID = '$buyer_id')
-			  GROUP BY a.auctionID, a.title, a.endDate, c.categoryName;";
-      $resultset = mysqli_query($conn, $sql) or die("database error:" . mysqli_error($conn));
+			  GROUP BY a.auctionID, s.username, a.title, a.endDate, c.categoryName;";
+      $resultset = mysqli_query($conn, $sql_1) or die("database error:" . mysqli_error($conn));
  	  // Check if the user has placed any bids
 	  if (mysqli_num_rows($resultset) == 0) {
 		echo "You haven't placed any bids yet!";
@@ -72,9 +72,10 @@
 		
 		$productTitle = $record['title'];
         $productCategory = $record['categoryName'];
+		$sellerUsername = $record['username'];
 		
 		// Determine the current state of the auction
-		$sql2 = "SELECT a.auctionID,
+		$sql_2 = "SELECT a.auctionID,
 					b.bidAmount,
 					a.reservePrice,
 					b.buyerID,
@@ -83,21 +84,21 @@
 				JOIN Bids b ON a.auctionID = b.auctionID
 				JOIN Buyers bu ON b.buyerID = bu.buyerID
 				WHERE a.auctionID = '$productID' AND b.bidAmount = (SELECT MAX(bidAmount) FROM Bids WHERE auctionID = '$productID');";
-		$result = $conn->query($sql2)->fetch_row() ?? false;
+		$result = $conn->query($sql_2)->fetch_row() ?? false;
 		$usernameHighestBidder = $result[4];
 		// Check if the auction has ended
 		if ($now > $end_time) {
 			// Check if there were no bids or the reserve price wasn't reached
-			if (mysqli_num_rows($conn->query($sql2)) == 0 || $result[1] < $result[2]) {
-			$auctionOutcome = 'The reserve price was not reached and the item was not sold!';
-			$leadingBidder = "";
+			if (mysqli_num_rows($conn->query($sql_2)) == 0 || $result[1] < $result[2]) {
+				$auctionOutcome = 'The reserve price was not reached and the item was not sold!';
+				$leadingBidder = "";
 			}
 			
 			// Otherwise, the reserve price was reached
 			else if ($result[1] >= $result[2]) {
-			$auctionOutcome = 'Winning bid: £' . $result[1] . ".";
+				$auctionOutcome = 'Winning bid: £' . $result[1] . ".";
 				// Check who won the auction
-				if ($buyer_id == $result[3]) {
+				if ($username == $usernameHighestBidder) {
 					$leadingBidder = "Congrats " . $usernameHighestBidder . "! You won the auction!";
 				}
 				else {
@@ -108,23 +109,28 @@
 		// The auction is still in progress
 		else if ($now <= $end_time) {
 			// There are no bids yet 
-			if (mysqli_num_rows($conn->query($sql2)) == 0) {
+			if (mysqli_num_rows($conn->query($sql_2)) == 0) {
 				$auctionOutcome = 'There are no bids yet!';
 				$leadingBidder = "";
 			}
 			// There are bids - show the highest
 			else {
 				$auctionOutcome = "Current highest bid: £" . $result[1] . ".";
-				$leadingBidder = "Highest bidder: " . $usernameHighestBidder . ".";
+				if ($username == $usernameHighestBidder) {
+					$leadingBidder = "You are the highest bidder!";
+				}
+				else {
+					$leadingBidder = "Highest bidder: " . $usernameHighestBidder . ".";
+				}
 			}
 		}    	
 			
 		// Get the user's bid history for this item and put it in a table
-		$sql3 = "SELECT bidDate, username, bidAmount 
+		$sql_3 = "SELECT bidDate, username, bidAmount 
 				FROM Bids, Buyers 
 				WHERE bids.buyerID = buyers.buyerID AND auctionID = '$productID' and bids.buyerID = '$buyer_id' 
 				ORDER BY bidDate ";
-		$result = $conn->query($sql3) ?? false;
+		$result = $conn->query($sql_3) ?? false;
 		  
 		$tableBids = '<table id="bidsTable' . $productID  . '" border="1" cellspacing="1" cellpadding="4" class="collapse">
 				<tr>
@@ -142,11 +148,12 @@
 		$tableBids .= '</table>'; 
 	  
       ?>
-        <div class="card" style="width: 18rem; margin-left: 0.5%; margin-right: 0.5%; margin-top: 0.5%; margin-bottom: 0.5%;">
+        <div class="card" style="width: 20rem; margin-left: 0.5%; margin-right: 0.5%; margin-top: 0.5%; margin-bottom: 0.5%;">
           <!--<img class="card-img-top" src="data:image/jpg;charset=utf8;base64,<?php echo base64_encode($record['image']); ?>" /> -->
           <div class="card-header">
 			<h4 class="card-title"><?php echo $productTitle ?></h4>
-            <h5 class="card-subtitle">Category: <?php echo $productCategory ?></h5>
+            <h5 class="card-subtitle">Category: <?php echo $productCategory ?> </h5><br>
+			<h5 class="card-subtitle">Seller: <?php echo $sellerUsername ?></h5>
 		  </div>
 		  
 		  <div class="card-body">

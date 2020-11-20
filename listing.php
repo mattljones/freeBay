@@ -16,7 +16,7 @@
   // Check if user is logged in
   if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) {
     $has_session = true;
-	$buyer_id = $_SESSION['userID'];
+	$user_id = $_SESSION['userID'];
 	$username = $_SESSION['username'];
 	$usertype = $_SESSION['account_type'];
   } else {
@@ -26,28 +26,43 @@
   // Get auctionID from the URL
   $auction_id = $_GET['auctionID'];
   
-  // Get item description, title, and remaining time
-  $sql_1 = "SELECT a.title, a.descript, a.endDate, a.startPrice, a.reservePrice, a.minIncrement, c.categoryName 
+  // Get relevant information about the auction
+  $sql_1 = "SELECT a.title, a.descript, a.startDate, a.endDate, a.startPrice, a.reservePrice, a.minIncrement, c.categoryName, s.username, s.sellerID
 			FROM Auctions a
-			LEFT JOIN Categories c on a.categoryID = c.categoryID 	
-			WHERE auctionID = $auction_id ";
+			LEFT JOIN Categories c ON a.categoryID = c.categoryID
+			LEFT JOIN Sellers s ON a.sellerID = s.sellerID
+			WHERE auctionID = '$auction_id'; ";
   $result = $conn->query($sql_1)->fetch_row() ?? false;
   $title = $result[0];
   $description = $result[1];
-  $end_time = new DateTime($result[2]);
-  $start_price = $result[3];
-  $reserve_price = $result[4];
-  $min_increment = $result[5];
-  $category = $result[6];
+  $start_time = new DateTime($result[2]);
+  $end_time = new DateTime($result[3]);
+  $start_price = $result[4];
+  $reserve_price = $result[5];
+  $min_increment = $result[6];
+  $category = $result[7];
+  $seller_username = $result[8];
+  $seller_id = $result[9];
+  
+  // If the start date is in the future, only the seller of the item should be able to see it, otherwise redirect
+  $now = new DateTime();
+  if ($now < $start_time && ($usertype == 'buyer' || $seller_id != $user_id )) {
+	redirect_index();
+  }
   
   // Get current price and number of bids
-  $sql_2 = "SELECT max(bidAmount), count(bidID) FROM Bids WHERE auctionID = $auction_id ";
+  $sql_2 = "SELECT max(bidAmount), count(bidID) 
+			FROM Bids 
+			WHERE auctionID = '$auction_id';";
   $result = $conn->query($sql_2)->fetch_row() ?? false;
   $current_price = floatval($result[0]);
   $num_bids = $result[1];
     
   // Get bid history and put it in a table
-  $sql_3 = "SELECT bidDate, username, bidAmount FROM Bids, Buyers WHERE bids.buyerID = buyers.buyerID AND auctionID = $auction_id ORDER BY bidDate ";
+  $sql_3 = "SELECT bidDate, username, bidAmount 
+			FROM Bids, Buyers 
+			WHERE bids.buyerID = buyers.buyerID AND auctionID = '$auction_id' 
+			ORDER BY bidDate;";
   $result = $conn->query($sql_3) ?? false;
   
   $table = '<table border="1" cellspacing="1" cellpadding="4">
@@ -56,17 +71,19 @@
             <th>Username</th> 
             <th>Bid Amount</th>
           </tr>';
-	foreach($result as $val){
+  foreach($result as $val){
     $table .= '<tr>
                 <td>'.$val['bidDate'].'</td>
                 <td>'.$val['username'].'</td> 
                 <td>'.$val['bidAmount'].'</td>
               </tr>';
 	}
-	$table .= '</table>'; 
+  $table .= '</table>'; 
   
   // Get number of watchers
-  $sql_4 = "SELECT count(buyerID) FROM watching WHERE auctionID = $auction_id ";
+  $sql_4 = "SELECT count(buyerID) 
+			FROM watching 
+			WHERE auctionID = '$auction_id';";
   $result = $conn->query($sql_4)->fetch_row() ?? false;
   $num_watchers = $result[0];  
   
@@ -76,7 +93,9 @@
   //       For now, this is hardcoded.
   
   if ($has_session == true) {
-	$sql_5 = "SELECT count(buyerID) FROM Watching WHERE auctionID = $auction_id and buyerID = $buyer_id ";
+	$sql_5 = "SELECT count(buyerID) 
+			  FROM Watching 
+			  WHERE auctionID = '$auction_id' AND buyerID = '$user_id';";
 	$result = $conn->query($sql_5)->fetch_row() ?? false;
 	if ($result[0] == 1) {
 		$watching = true;
@@ -98,9 +117,7 @@
 	  $min_bid = max($start_price, $current_price) + $min_increment;
   }
    
-  // Calculate time to auction end
-  $now = new DateTime();
-  
+  // Calculate time to auction end 
   if ($now < $end_time) {
     $time_to_end = date_diff($now, $end_time);
     $time_remaining = ' (in ' . display_time_remaining($time_to_end) . ')';
@@ -121,14 +138,14 @@
 <?php  if ($now < $end_time): ?>
     <div id="watch_nowatch" <?php if (($has_session && $watching) || (!$has_session) || ($usertype == "seller")) echo('style="display: none"');?> >
       <button type="button" class="btn btn-outline-secondary btn-sm" onclick="addToWatchlist()">+ Add to watchlist</button>	
-	  <button type="button" class="btn btn-outline-secondary btn-sm" disabled>Number of watchers: <?php echo $num_watchers ?></button>
+	  <button type="button" class="btn btn-outline-secondary btn-sm" disabled>No. of watchers: <?php echo $num_watchers ?></button>
     </div>
 <?php endif /* Print nothing otherwise */ ?>
 
     <div id="watch_watching" <?php if (!$has_session || !$watching || ($usertype == "seller") ) echo('style="display: none"');?> >
       <button type="button" class="btn btn-success btn-sm" disabled>Watching</button>
       <button type="button" class="btn btn-danger btn-sm" onclick="removeFromWatchlist()">Remove watch</button>
-	  <button type="button" class="btn btn-outline-secondary btn-sm" disabled>Number of watchers: <?php echo $num_watchers ?></button>
+	  <button type="button" class="btn btn-outline-secondary btn-sm" disabled>No. of watchers: <?php echo $num_watchers ?></button>
     </div>
 
   </div>
@@ -140,10 +157,12 @@
 <div class="row"> <!-- Row #2 with auction description + bidding info -->
   <div class="col-sm-8"> <!-- Left col with item info -->
 	
-	<h5 class="my-3">Category: <?php echo($category); ?></h2>
-    <div class="itemDescription">
-    <?php echo($description); ?>
-    </div>
+	<h5 class="my-3">Category: <?php echo($category); ?> | Seller: <?php echo($seller_username); ?> </h5>
+   <!-- <div class="itemDescription">Description: <?php echo($description); ?></div>-->
+    <div class="card">
+		<h5 class="card-header">Description</h5>
+			<div class="card-body"><?php echo $description ?></div>
+	</div>	
 
   </div>
 
@@ -151,7 +170,8 @@
 
 	<?php if ($now >= $end_time && $current_price >= $reserve_price): ?>
 		<p>This auction ended on <?php echo(date_format($end_time, 'j M H:i')) ?>.</p>
-		<p>The item was sold for £<?php echo(number_format($current_price, 2)) ?>.</p>
+		<hr class="rounded">
+		<p class="lead">The item was sold for £<?php echo(number_format($current_price, 2)) ?>.</p>
 		<div class="card">
 			<h5 class="card-header">
 			<a href="#" id="bids" onclick="toggleElement('#bidsTable')">Number of bids: <?php echo(number_format($num_bids, 0)) ?>
@@ -165,7 +185,8 @@
 	
 	<?php elseif ($now >= $end_time && $current_price < $reserve_price): ?>
 		<p>This auction ended on <?php echo(date_format($end_time, 'j M H:i')) ?>.</p>
-		<p>The reserve price was not reached and the item was not sold.</p>
+		<hr class="rounded">
+		<p class="lead">The reserve price was not reached and the item was not sold.</p>
 		<div class="card">
 			<h5 class="card-header">
 			<a href="#" id="bids" onclick="toggleElement('#bidsTable')">Number of bids: <?php echo(number_format($num_bids, 0)) ?>
@@ -182,8 +203,10 @@
 		<hr class="rounded">	
 		<p class="lead">Starting price: £<?php echo(number_format($start_price, 2)) ?></p>
 		<p class="lead">Minimum increment: £<?php echo(number_format($min_increment, 2)) ?></p>
-		<p class="lead">Current bid: £<?php echo(number_format($current_price, 2)) ?></p>
-		<?php if ($current_price < $reserve_price): ?>
+		<p class="lead">Current price: £<?php echo(number_format($current_price, 2)) ?></p>
+		<?php if ($start_price == $reserve_price): ?>
+			<p class="lead">This auction has no reserve price!</p>
+		<?php elseif ($current_price < $reserve_price): ?>
 			<p class="lead">Reserve price has not been reached!</p>
 		<?php else: ?>
 			<p class="lead">Reserve price has been reached!</p>

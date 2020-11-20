@@ -61,4 +61,11 @@ function print_listing_li($item_id, $title, $desc, $price, $num_bids, $end_time)
   );
 }
 
+// Redirect to homepage
+function redirect_index()
+{
+	$indexURL = 'http://' . $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF']) . '/index.php';
+	header('Location: ' . $indexURL);
+}
+
 ?>
