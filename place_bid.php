@@ -46,7 +46,7 @@
   $result = $conn->query($sql_0)->fetch_row() ?? false;
   $highestBidderID = $result[0];
   $auction_title = $result[1];  
-  $end_date = $result[2];
+  $end_date = new DateTime($result[2]);
   
   // Check if bid was placed before endDate and reject it otherwise
   // This can happen if the user loads the page before endDate and then submits the bid after endDate
