@@ -58,10 +58,12 @@
         $productID = $record['auctionID'];
         if ($now < $end_time) {
           $time_to_end = date_diff($now, $end_time);
-          $productTimeLeft = " Auction will end in " . display_time_remaining($time_to_end) . ".";
+          $productTimeLeft = " Auction ends in " . display_time_remaining($time_to_end);
+		  $timeLeftFormat = "bg-success text-white";
         }
         else {
-          $productTimeLeft = "Auction ended.";
+          $productTimeLeft = "Auction ended";
+		  $timeLeftFormat = "bg-warning text-dark";
         }
 		
 		$productTitle = $record['title'];
@@ -124,19 +126,20 @@
           <div class="card-header">
 			<h4 class="card-title"><?php echo $productTitle ?></h4>
             <h5 class="card-subtitle">Category: <?php echo $productCategory ?></h5><br>
-			<h5 class="card-subtitle">Seller: <?php echo $sellerUsername ?></h5>
+			<small><span class="<?php echo $timeLeftFormat; ?>"><?php echo $productTimeLeft?></span></small>
 		  </div>
 		  
 		  <div class="card-body">
-			<p class="card-text"><?php echo $productTimeLeft?> <?php echo $auctionOutcome ?></p>
+			<p class="card-text"><?php echo $auctionOutcome ?></p>
 			<p class="card-text"><b><?php echo $leadingBidder ?></b></p>
           </div>
 		  
           <div class="card-footer">
             <div class="buy d-flex justify-content-between align-items-center">
-              <a href="listing.php?auctionID=<?= $productID ?>" type="submit" class="btn btn-outline-primary text-center">View Item</a>
+			  <a href="listing.php?auctionID=<?= $productID ?>" type="submit" class="btn btn-outline-primary text-center">View Item</a>
 			  <button type="button" class="btn btn-danger btn-sm" onclick="removeFromWatchlist(<?php echo $productID ?>)">Remove watch</button>
             </div>
+			<small>Seller: <?php echo $sellerUsername ?></small>
           </div>
         </div>
       <?php } ?>

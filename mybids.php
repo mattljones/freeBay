@@ -64,10 +64,12 @@
         $productID = $record['auctionID'];
         if ($now < $end_time) {
           $time_to_end = date_diff($now, $end_time);
-          $productTimeLeft = " Auction will end in " . display_time_remaining($time_to_end) . ".";
+          $productTimeLeft = " Auction ends in " . display_time_remaining($time_to_end);
+		  $timeLeftFormat = "bg-success text-white";
         }
         else {
-          $productTimeLeft = "Auction ended.";
+          $productTimeLeft = "Auction ended";
+		  $timeLeftFormat = "bg-warning text-dark";
         }
 		
 		$productTitle = $record['title'];
@@ -153,20 +155,20 @@
           <div class="card-header">
 			<h4 class="card-title"><?php echo $productTitle ?></h4>
             <h5 class="card-subtitle">Category: <?php echo $productCategory ?> </h5><br>
-			<h5 class="card-subtitle">Seller: <?php echo $sellerUsername ?></h5>
+			<small><span class="<?php echo $timeLeftFormat; ?>"><?php echo $productTimeLeft?></span></small>
 		  </div>
 		  
 		  <div class="card-body">
 			<p class="card-text"><a href="#" id="bids" onclick="toggleElement('#bidsTable<?php echo $productID ?>')">Your bids <?php echo $tableBids ?></a></p>
-			<p class="card-text"><?php echo $productTimeLeft?> <br> <?php echo $auctionOutcome ?></p>
+			<p class="card-text"><?php echo $auctionOutcome ?></p>
 			<p class="card-text"><b><?php echo $leadingBidder ?></b></p>
           </div>
 		  
           <div class="card-footer">
             <div class="buy d-flex justify-content-between align-items-center">
-              <a href="listing.php?auctionID=<?= $productID ?>" type="submit" class="btn btn-outline-primary text-center">View Item</a>
-              <!--<a href="#" class="btn btn-danger mt-3"><i class="fas fa-shopping-cart"></i> View Item</a>-->
-            </div>
+				<div><small">Seller: <?php echo $sellerUsername ?></small></div>            
+				<a href="listing.php?auctionID=<?= $productID ?>" type="submit" class="btn btn-outline-primary text-center">View Item</a>
+			</div>
           </div>
         </div>
       <?php } ?>
