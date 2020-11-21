@@ -65,11 +65,11 @@
         if ($now < $end_time) {
           $time_to_end = date_diff($now, $end_time);
           $productTimeLeft = " Auction ends in " . display_time_remaining($time_to_end);
-		  $timeLeftFormat = "bg-success text-white";
+		  $timeLeftFormat = "badge badge-success";
         }
         else {
           $productTimeLeft = "Auction ended";
-		  $timeLeftFormat = "bg-warning text-dark";
+		  $timeLeftFormat = "badge badge-warning";
         }
 		
 		$productTitle = $record['title'];
@@ -98,7 +98,7 @@
 			
 			// Otherwise, the reserve price was reached
 			else if ($result[1] >= $result[2]) {
-				$auctionOutcome = 'Winning bid: £' . $result[1] . ".";
+				$auctionOutcome = 'Winning bid: £' . number_format($result[1], 2) . ".";
 				// Check who won the auction
 				if ($username == $usernameHighestBidder) {
 					$leadingBidder = "Congrats " . $usernameHighestBidder . "! You won the auction!";
@@ -117,7 +117,7 @@
 			}
 			// There are bids - show the highest
 			else {
-				$auctionOutcome = "Current highest bid: £" . $result[1] . ".";
+				$auctionOutcome = "Current highest bid: £" . number_format($result[1], 2) . ".";
 				if ($username == $usernameHighestBidder) {
 					$leadingBidder = "You are the highest bidder!";
 				}
@@ -155,7 +155,7 @@
           <div class="card-header">
 			<h4 class="card-title"><?php echo $productTitle ?></h4>
             <h5 class="card-subtitle">Category: <?php echo $productCategory ?> </h5><br>
-			<small><span class="<?php echo $timeLeftFormat; ?>"><?php echo $productTimeLeft?></span></small>
+			<span class="<?php echo $timeLeftFormat ?>"><?php echo $productTimeLeft ?></span>
 		  </div>
 		  
 		  <div class="card-body">
@@ -166,7 +166,7 @@
 		  
           <div class="card-footer">
             <div class="buy d-flex justify-content-between align-items-center">
-				<div><small">Seller: <?php echo $sellerUsername ?></small></div>            
+				<div><span class="text-info">Seller: <?php echo $sellerUsername ?></span></div>            
 				<a href="listing.php?auctionID=<?= $productID ?>" type="submit" class="btn btn-outline-primary text-center">View Item</a>
 			</div>
           </div>

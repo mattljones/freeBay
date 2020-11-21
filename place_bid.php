@@ -141,7 +141,7 @@
 <div class="row"> <!-- Row #1 with auction title + watch button -->
 <div class="col-sm-8">
 <?php if ($bid_success == 1):?>
-    <h2 class="my-3"><?php echo("You successfully placed a bid of £" . $bid_amount . "!") ?></h2>
+    <h2 class="my-3"><?php echo("You successfully placed a bid of £" . number_format($bid_amount, 2) . "!") ?></h2>
 	<?php if (!$watching):?>
 		<div id="watch_nowatch">
 		<h5>You don't have this auction on your watchlist, would you like to add it?</h5>
