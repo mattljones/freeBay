@@ -1,5 +1,4 @@
-);
-?>
+
 <?php include_once("header.php"); ?>
 <?php require("utilities.php"); ?>
 <?php
@@ -12,6 +11,8 @@ $sellerID=$_SESSION['userID'];
 ?>
 <hr>
 
+
+<form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="POST">
 
 
 
@@ -103,27 +104,27 @@ $sellerID=$_SESSION['userID'];
       <div class="form-group" style="margin-bottom: 1rem">
         <div class="form-check">
           <input class="form-check-input" type="radio" value="checkActive" id="showActive1" name="checkedStatus[]" <?php echo $activeChecked1 ?>>
-          <label class="form-check-label" for="showActive1">Show Active Auctions</label>
+          <label class="form-check-label" for="showActive1">Show Active</label>
         </div>
         <div class="form-check">
           <input class="form-check-input" type="radio" value="checkActive2" id="showActive2" name="checkedStatus[]" <?php echo $activeChecked2 ?>>
-          <label class="form-check-label" for="showActive2">Show Active Auctions(met reserve price)</label>
+          <label class="form-check-label" for="showActive2">Show Active(met reserve price)</label>
         </div>
         <div class="form-check">
           <input class="form-check-input" type="radio" value="checkActive3" id="showActive3" name="checkedStatus[]" <?php echo $activeChecked3 ?>>
-          <label class="form-check-label" for="showActive3">Show Active Auctions(not met reserve price)</label>
+          <label class="form-check-label" for="showActive3">Show Active(not met reserve price)</label>
         </div>
         <div class="form-check">
           <input class="form-check-input" type="radio" value="checkScheduled" id="showScheduled" name="checkedStatus[]" <?php echo $scheduledChecked ?>>
-          <label class="form-check-label" for="showScheduled">Show Scheduled Auctions</label>
+          <label class="form-check-label" for="showScheduled">Show Scheduled</label>
         </div>
         <div class="form-check">
           <input class="form-check-input" type="radio" value="checkSoldCompleted" id="showCompleted1" name="checkedStatus[]" <?php echo $soldCompletedChecked ?>>
-          <label class="form-check-label" for="showCompleted1">Show Sold & Completed Auctions</label>
+          <label class="form-check-label" for="showCompleted1">Show Completed(Sold)</label>
         </div>
         <div class="form-check">
           <input class="form-check-input" type="radio" value="checkUnsoldCompleted" id="showCompleted2" name="checkedStatus[]" <?php echo $unSoldCompletedChecked ?>>
-          <label class="form-check-label" for="showCompleted2">Show Unsold & Completed Auctions</label>
+          <label class="form-check-label" for="showCompleted2">Show Completed(Unsold)</label>
         </div>
         <button type="submit" class="btn btn-outline-primary" style="margin-left: 0.5%">Apply</button>
       </div>
@@ -223,8 +224,8 @@ $sellerID=$_SESSION['userID'];
         <div class="form-check">
           <input class="form-check-input" type="radio" value="endingLaterChecked" id="showEndDate2" name="checkedOrder[]" <?php echo $endingLaterChecked ?>>
           <label class="form-check-label" for="showEndDate2">End date (latest to soonest)</label>
+   
         </div>
-       
         <button type="submit" class="btn btn-outline-primary" style="margin-left: 0.5%">Apply</button>
       </div>
     </form>
@@ -285,18 +286,33 @@ $sellerID=$_SESSION['userID'];
         if (in_array("checkLowPrice", $_POST['checkedOrder'])) {
           $sql .= "maxBid";
         }
-        
+        if (in_array("checkLowNoBids", $_POST['checkedOrder'])) {
+          $sql .= "noOfBidders";
+        }
+        if (in_array("checkLowNoWatchers", $_POST['checkedOrder'])) {
+          $sql .= "noOfWatching";
+        }
         if (in_array("checkHighPrice", $_POST['checkedOrder'])) {
           $sql .= "maxBid DESC";
         }
-        
+        if (in_array("checkHighNoBids", $_POST['checkedOrder'])) {
+          $sql .= "noOfBidders DESC";
+        }
+        if (in_array("checkHighNoWatchers", $_POST['checkedOrder'])) {
+          $sql .= "noOfWatching DESC";
+        }
         if (in_array("endingSoonChecked", $_POST['checkedOrder'])) {
           $sql .= "endDate";
         }
         if (in_array("endingLaterChecked", $_POST['checkedOrder'])) {
           $sql .= "endDate DESC";
         }
-        
+        if (in_array("newListedChecked", $_POST['checkedOrder'])) {
+          $sql .= "createDate DESC";
+        }
+        if (in_array("oldListedChecked", $_POST['checkedOrder'])) {
+          $sql .= "createDate";
+        }
       }
       $resultset = mysqli_query($conn, $sql) or die("database error:" . mysqli_error($conn));
       $num_rows = mysqli_num_rows($resultset);
