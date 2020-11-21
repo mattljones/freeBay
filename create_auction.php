@@ -137,18 +137,29 @@ if (!isset($_SESSION['account_type']) || $_SESSION['account_type'] != 'seller') 
         <!-- Start date -->
         <div class="form-group row">
           <label for="auctionStartDate" class="col-sm-2 col-form-label text-right">Start date</label>
-          <div class="col-sm-10">
-            <input type="datetime-local" class="form-control" id="Startdate" name="Startdate"  required="required"/>
-            <small id="StartDateHelp" class="form-text text-muted"><span class="text-danger">* Required.</span> Auction start date (and time).</small>
+          <div class="col-sm-4">
+            <input type="date" class="form-control" id="Startdate" name="Startdate"  required="required"/>
+			<small id="StartDateHelp" class="form-text text-muted"><span class="text-danger">* Required.</span> Auction start date.</small>
           </div>
+		  <label for="auctionStartDate" class="col-sm-2 col-form-label text-right">Start time</label>
+          <div class="col-sm-4">
+            <input type="time" class="form-control" id="Starttime" name="Starttime"  required="required"/>
+			<small class="form-text text-muted"><span class="text-danger">* Required.</span> Auction start time.</small>
+          </div>
+		 
         </div>
 
         <!-- End date -->
         <div class="form-group row">
           <label for="auctionEndDate" class="col-sm-2 col-form-label text-right">End date</label>
-          <div class="col-sm-10">
-            <input type="datetime-local" class="form-control" id="Enddate" name="Enddate" required="required">
-            <small id="endDateHelp" class="form-text text-muted"><span class="text-danger">* Required.</span> Auction end date (and time).</small>
+          <div class="col-sm-4">
+            <input type="date" class="form-control" id="Enddate" name="Enddate" required="required">
+            <small id="endDateHelp" class="form-text text-muted"><span class="text-danger">* Required.</span> Auction end date.</small>
+          </div>
+		  <label for="auctionEndDate" class="col-sm-2 col-form-label text-right">End time</label>
+          <div class="col-sm-4">
+            <input type="time" class="form-control" id="Endtime" name="Endtime" required="required">
+            <small class="form-text text-muted"><span class="text-danger">* Required.</span> Auction end time.</small>
           </div>
         </div>
 
@@ -187,12 +198,16 @@ function modifysubmit() {
   var myDate = new Date();
   var d3 = myDate.toLocaleString();
   var Startdate = document.getElementById("Startdate").value;
+  var Starttime = document.getElementById("Starttime").value;
+  var Startdatetime = Startdate + 'T' + Starttime; 
   var Enddate = document.getElementById("Enddate").value;
+  var Endtime = document.getElementById("Endtime").value;
+  var Enddatetime = Enddate + 'T' + Endtime; 
   var startPrice = parseInt(document.getElementById("startingPrice").value);
   var reservePrice = parseInt(document.getElementById("ReservePrice").value);
   var minIncrement = parseInt(document.getElementById("minIncrement").value);
-  var tempDate1 = Date.parse(Startdate);
-  var tempDate2 = Date.parse(Enddate);
+  var tempDate1 = Date.parse(Startdatetime);
+  var tempDate2 = Date.parse(Enddatetime);
   var tempNowDate = Date.parse(getDT());
 
   if (startPrice > reservePrice) {

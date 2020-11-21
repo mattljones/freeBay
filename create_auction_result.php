@@ -21,8 +21,10 @@ $descript = validate_descript($conn, $_POST['Details']);
 $category = validate_category($conn, $_POST['Category']);
 $startingPrice = validate_price($conn, $_POST['startingPrice']);
 $createDate = date("Y-m-d H:i"); // for record-keeping in the database
-$startDate = validate_date($conn, $_POST['Startdate']);
-$endDate = validate_date($conn, $_POST['Enddate']);
+$startDateTime = $_POST['Startdate'] . "T" . $_POST['Starttime'];
+$startDate = validate_date($conn, $startDateTime);
+$endDateTime = $_POST['Enddate'] . "T" . $_POST['Endtime'];
+$endDate = validate_date($conn, $endDateTime);
 
 // Assign default values to optional values not entered by the user
 if (empty($_POST['ReservePrice'])) { 

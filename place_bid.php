@@ -71,10 +71,24 @@
 			WHERE auctionID = '$auction_id';";
   $resultset = mysqli_query($conn, $sql_2) or die("database error:" . mysqli_error($conn));
   
- 
+  // If bid was succesful, check if the user has this item on their watchlist 
+  if ($bid_success == 1) {
+	$sql_3 = "SELECT count(buyerID) 
+			  FROM Watching 
+			  WHERE auctionID = '$auction_id' AND buyerID = '$buyer_id';";
+	$result = $conn->query($sql_3)->fetch_row() ?? false;
+	if ($result[0] == 1) {
+		$watching = true;
+	} else {
+		$watching = false;
+	}
+  }
+  
   // If the bid was successful and this item is on at least one buyer's watchlist, send an email
   if ($bid_success == 1 && mysqli_num_rows($resultset) > 0) {
-	  
+	  //echo urlencode($_SERVER['HTTP_HOST']);
+	  //echo urlencode(dirname($_SERVER['PHP_SELF']));
+	  //echo htmlentities(urlencode(dirname($_SERVER['PHP_SELF'])));
 	  // Go through each buyer and send an email. Sending separate emails allows for customization.  
 	  while ($record = mysqli_fetch_assoc($resultset)) {
 		  $userID = $record['buyerID'];
@@ -107,15 +121,13 @@
 			  // Content
 			  // Get the auction URL so the user can directly access it from the email. Not sure if this will work on other computers.
 			  $auctionURL = 'http://' . htmlentities($_SERVER['HTTP_HOST']) . htmlentities(dirname($_SERVER['PHP_SELF'])) . '/listing.php?auctionID=' . $auction_id;
-			  $mail->isHTML(true);                                  // Set email format to HTML
-			  $mail->Subject = $username . ', an auction from your watchlist has received a new bid!';
-			  $mail->Body    = 'Auction <b><a href =' . $auctionURL . '>' . $auction_title . '</a></b> has received a bid of <b>£' . $bid_amount . '</b> by user <b>' . $buyer_username . '</b>.'
-								. '<br>' . $outbid; 
-
+			  $mail->isHTML(true);      // Set email format to HTML
+			  $mail->Subject = "$username, an auction from your watchlist has received a new bid!";
+			  $mail->Body    = "Auction <b><a href =$auctionURL>$auction_title</a></b> has received a bid of <b>£$bid_amount</b> by user <b>$buyer_username</b><br>$outbid"; 
 			  $mail->send();
-			  //echo 'Message has been sent';
+
 		  } catch (Exception $e) {
-			  //echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+			  // Do nothing if there's an error
 		  }
 	  }
   }
@@ -127,26 +139,63 @@
 <div class="container">
 
 <div class="row"> <!-- Row #1 with auction title + watch button -->
-<div class="col-sm-8"> <!-- Left col -->
-<?php
-  if ($bid_success == 1):
-?>
+<div class="col-sm-8">
+<?php if ($bid_success == 1):?>
     <h2 class="my-3"><?php echo("You successfully placed a bid of £" . $bid_amount . "!") ?></h2>
-<?php elseif ($bid_success == 0): 
-?>
+	<?php if (!$watching):?>
+		<div id="watch_nowatch">
+		<h5>You don't have this auction on your watchlist, would you like to add it?</h5>
+			<button type="button" class="btn btn-outline-secondary btn-sm" onclick="addToWatchlist()">+ Add to watchlist</button>	
+		</div>
+		<div id="watch_watching" style="display: none">
+			<h5>Auction addded to watchlist successfully!</h5>	
+		</div>
+	<?php endif ?>
+<?php elseif ($bid_success == 0): ?>
     <h2 class="my-3"><?php echo("Error: your bid was not placed!") ?></h2>
 </div>
 </div>
 <?php endif ?>
+<br>
 <div class="row"> <!-- Row #2 with auction description + bidding info -->
-  <div class="col-sm-8"> <!-- Left col with item info -->
-
-    <div class="goBack"> 
-		<a href="listing.php?auctionID=<?php echo($auction_id) ?>"> Go back to listing.</a>
-    </div>
-
-  </div>
+<div class="col-sm-8">
+	<h5><a href="listing.php?auctionID=<?php echo($auction_id) ?>"> Go back to listing.</a></h5>
 </div>
+</div>
+
 
 <?php include_once("footer.php") ?>
 
+<script>
+// JavaScript functions: addToWatchlist and removeFromWatchlist.
+function addToWatchlist(button) {
+  // This performs an asynchronous call to a PHP function using POST method.
+  // Sends item ID as an argument to that function.
+  $.ajax('watchlist_funcs.php', {
+    type: "POST",
+    data: {functionname: 'add_to_watchlist', arguments: [<?php echo($auction_id);?>]},
+
+    success: 
+      function (obj, textstatus) {
+        // Callback function for when call is successful and returns obj
+        var objT = obj.trim();
+ 
+        if (objT.includes("success")) {
+		  $("#watch_nowatch").hide();
+          $("#watch_watching").show();
+        }
+        else {
+          var mydiv = document.getElementById("watch_nowatch");
+          mydiv.appendChild(document.createElement("br"));
+          mydiv.appendChild(document.createTextNode("Add to watch failed. Try again later."));
+        }
+      },
+
+    error:
+      function (obj, textstatus) {
+        console.log("Error");
+      }
+  }); // End of AJAX call
+
+} // End of addToWatchlist func
+</script>
