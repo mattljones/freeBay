@@ -229,7 +229,7 @@
     <hr>
     <div id="productCards" class="row">
       <?php
-      $sqlMaxBid = "SELECT MAX(bidAmount) as maxBid, coalesce(count(bidID), 0) as noOfBidders, auctionID, buyerID FROM Bids GROUP BY auctionID";
+      $sqlMaxBid = "SELECT MAX(bidAmount) as maxBid, coalesce(count(DISTINCT buyerID), 0) as noOfBidders, auctionID, buyerID FROM Bids GROUP BY auctionID";
       $sqlMainMaxBid = "SELECT mainTable.*, coalesce(maxBid,mainTable.startPrice) as maxBid,  coalesce(noOfBidders,0) as noOfBidders, buyerID as maxBidderID FROM Auctions mainTable LEFT JOIN ($sqlMaxBid) maxBidTable ON mainTable.auctionID = maxBidTable.auctionID";
       $sqlWatchTable = "SELECT COUNT(auctionID) as noOfWatching, auctionID FROM `Watching` GROUP BY auctionID";
       $sqlMainMaxBidWatch = "SELECT mainTable.*, coalesce(noOfWatching,0) as noOfWatching FROM ($sqlMainMaxBid) mainTable LEFT JOIN ($sqlWatchTable) watchTable ON mainTable.auctionID = watchTable.auctionID";
