@@ -124,7 +124,7 @@ else { // Providing an explanation for a blank page (possible for bidders who ha
 
                  <div class="col-sm-2">
                    <h5 class="card-text text-center">Current price:</h5>
-                   <h5 class="card-text text-center text-success">'.$currentPrice.'</h5>
+                   <h5 class="card-text text-center text-success">£'.$currentPrice.'</h5>
                  </div>
 
                  <div class="col-sm-2">
