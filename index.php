@@ -79,19 +79,19 @@
       <div class="form-group" style="margin-bottom: 1rem">
         <div class="form-check">
           <input class="form-check-input" type="radio" value="checkActive" id="showActive1" name="checkedStatus[]" <?php echo $activeChecked1 ?>>
-          <label class="form-check-label" for="showActive1">Show Active Auctions</label>
+          <label class="form-check-label" for="showActive1">Show Active</label>
         </div>
         <div class="form-check">
           <input class="form-check-input" type="radio" value="checkAllCompleted" id="showCompleted3" name="checkedStatus[]" <?php echo $allCompletedChecked ?>>
-          <label class="form-check-label" for="showCompleted3">Show All Completed Auctions</label>
+          <label class="form-check-label" for="showCompleted3">Show Completed (All)</label>
         </div>
         <div class="form-check">
           <input class="form-check-input" type="radio" value="checkSoldCompleted" id="showCompleted1" name="checkedStatus[]" <?php echo $soldCompletedChecked ?>>
-          <label class="form-check-label" for="showCompleted1">Show Sold & Completed Auctions</label>
+          <label class="form-check-label" for="showCompleted1">Show Completed (Sold)</label>
         </div>
         <div class="form-check">
           <input class="form-check-input" type="radio" value="checkUnsoldCompleted" id="showCompleted2" name="checkedStatus[]" <?php echo $unSoldCompletedChecked ?>>
-          <label class="form-check-label" for="showCompleted2">Show Unsold & Completed Auctions</label>
+          <label class="form-check-label" for="showCompleted2">Show Completed (Unsold)</label>
         </div>
         <button type="submit" class="btn btn-outline-primary" style="margin-left: 0.5%">Apply</button>
       </div>
@@ -366,7 +366,7 @@
           <div class="card-footer <?php echo $cardStatusFormat ?>">
             <div class="buy d-flex justify-content-between align-items-center">
               <div class="price text-success">
-                <h5 class="mt-4">£<?= $productCurrentPrice ?></h5>
+                <h5 class="mt-4">£<?= number_format($productCurrentPrice,2) ?></h5>
               </div>
               <a href="listing.php?auctionID=<?= $productID ?>" type="submit" class="btn btn-outline-primary text-center">View Item</a>
               <!--<a href="#" class="btn btn-danger mt-3"><i class="fas fa-shopping-cart"></i> View Item</a>-->
