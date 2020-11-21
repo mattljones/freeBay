@@ -88,10 +88,7 @@
   $num_watchers = $result[0];  
   
   
-  // TODO: If the user has a session, use it to make a query to the database
-  //       to determine if the user is already watching this item.
-  //       For now, this is hardcoded.
-  
+  // If the user has a session, determine if the user is already watching this item.
   if ($has_session == true) {
 	$sql_5 = "SELECT count(buyerID) 
 			  FROM Watching 
