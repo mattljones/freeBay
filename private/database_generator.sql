@@ -30,7 +30,8 @@ CREATE TABLE Buyers (
     firstName VARCHAR(35) NOT NULL,
     familyName VARCHAR(35) NOT NULL,
     CONSTRAINT Buyers_pk PRIMARY KEY (buyerID),
-    CONSTRAINT Buyers_ck UNIQUE (username)  -- Also check UNIQUE across both Buyers & Sellers using a trigger (see below); done here too for redundancy
+    CONSTRAINT Buyers_ck1 UNIQUE (username),  -- Also check UNIQUE across both Buyers & Sellers using a trigger (see below); done here too for redundancy
+    CONSTRAINT Buyers_ck2 UNIQUE (email)      -- Also check UNIQUE across both Buyers & Sellers using a trigger (see below); done here too for redundancy
     )
     ENGINE = InnoDB;
 
@@ -60,7 +61,8 @@ CREATE TABLE Sellers (
     firstName VARCHAR(35) NOT NULL,
     familyName VARCHAR(35) NOT NULL,
     CONSTRAINT Sellers_pk PRIMARY KEY (sellerID),
-    CONSTRAINT Sellers_ck UNIQUE (username)  -- Also check UNIQUE across both Buyers & Sellers using a trigger (see below); done here too for redundancy
+    CONSTRAINT Sellers_ck1 UNIQUE (username),  -- Also check UNIQUE across both Buyers & Sellers using a trigger (see below); done here too for redundancy
+    CONSTRAINT Sellers_ck2 UNIQUE (email)      -- Also check UNIQUE across both Buyers & Sellers using a trigger (see below); done here too for redundancy
     )
     ENGINE = InnoDB;
 
@@ -304,7 +306,7 @@ CREATE FUNCTION username_check (
     RETURNS VARCHAR(10)
     BEGIN
         DECLARE storeVal1 INT UNSIGNED;
-        SELECT 1 INTO storeVal1 FROM (SELECT username FROM Buyers UNION ALL SELECT username FROM Sellers) AS combined WHERE username = username_input;
+        SELECT 1 INTO storeVal1 FROM (SELECT username FROM Buyers UNION ALL SELECT username FROM Sellers) AS Combined WHERE username = username_input;
         IF storeVal1 != 0 THEN
             RETURN 'not_unique';
         ELSE
@@ -335,6 +337,49 @@ CREATE TRIGGER CHK_seller_username_unique
         IF storeVal = 'not_unique' THEN
             SIGNAL SQLSTATE '45000' 
             SET MESSAGE_TEXT = "Please enter a unique username.";
+        END IF;    
+    END $$ 
+DELIMITER ;
+
+-- Ensuring email is unique across both buyers and sellers (for security purposes)
+DELIMITER $$
+CREATE FUNCTION email_check (
+    email_input VARCHAR(254)
+    )
+    RETURNS VARCHAR(10)
+    BEGIN
+        DECLARE storeVal1 INT UNSIGNED;
+        SELECT 1 INTO storeVal1 FROM (SELECT email FROM Buyers UNION ALL SELECT email FROM Sellers) AS Combined WHERE email = email_input;
+        IF storeVal1 != 0 THEN
+            RETURN 'not_unique';
+        ELSE
+            RETURN 'unique';
+        END IF;
+    END $$
+DELIMITER ;
+
+DELIMITER $$
+CREATE TRIGGER CHK_buyer_email_unique 
+    BEFORE INSERT ON Buyers FOR EACH ROW
+    BEGIN
+        DECLARE storeVal VARCHAR(10);
+        SET storeVal = email_check(NEW.email);
+        IF storeVal = 'not_unique' THEN
+            SIGNAL SQLSTATE '45000' 
+            SET MESSAGE_TEXT = "Please enter a unique email.";
+        END IF;    
+    END $$ 
+DELIMITER ;
+
+DELIMITER $$
+CREATE TRIGGER CHK_seller_email_unique 
+    BEFORE INSERT ON Sellers FOR EACH ROW
+    BEGIN
+        DECLARE storeVal VARCHAR(10);
+        SET storeVal = email_check(NEW.email);
+        IF storeVal = 'not_unique' THEN
+            SIGNAL SQLSTATE '45000' 
+            SET MESSAGE_TEXT = "Please enter a unique email.";
         END IF;    
     END $$ 
 DELIMITER ;
@@ -402,7 +447,7 @@ INSERT INTO Buyers (username, email, pass, firstName, familyName)
 INSERT INTO Buyers (username, email, pass, firstName, familyName)
   VALUES ('unluckyresource', 'tarreau@live.com', '90d2a3ae2546f6eda26c042a244e14bec3a106ea042a244e14bec3a106ea', 'Kayla', 'Hurley');
 INSERT INTO Buyers (username, email, pass, firstName, familyName)
-  VALUES ('bowspritcalling', 'tarreau@live.com', 'cb95f5661150e083e14658e0c62463854a99b6a758e0c62463854a99b6a7', 'Meadow', 'Suarez');
+  VALUES ('bowspritcalling', 'bowcrew@gmail.com', 'cb95f5661150e083e14658e0c62463854a99b6a758e0c62463854a99b6a7', 'Meadow', 'Suarez');
 INSERT INTO Buyers (username, email, pass, firstName, familyName)
   VALUES ('drabitbedight', 'qmacro@optonline.net', 'f6e523897e5920e01c862ee99d47ed73f2baec322ee99d47ed73f2baec32', 'Rebecca', 'Quintero');
 INSERT INTO Buyers (username, email, pass, firstName, familyName)

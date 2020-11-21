@@ -26,7 +26,7 @@
   <div class="form-group row">
     <label for="username" class="col-sm-2 col-form-label text-right">Username</label>
 	  <div class="col-sm-10">
-      <input type="text" class="form-control" name="username" id="username" placeholder="Enter a username (6 to 20 characters)" pattern=".{6,20}" title="Usernames should be between 6 and 20 characters long." onblur="checkUniqueLive()" required> <!-- Check username is unique in real time -->
+      <input type="text" class="form-control" name="username" id="username" placeholder="Enter a username (6 to 20 characters)" pattern=".{6,20}" title="Usernames should be between 6 and 20 characters long." onblur="checkUsernameUniqueLive()" required> <!-- Check username is unique in real time -->
       <small class="form-text text-muted"><span class="text-danger" id="usernameHelpText">* Required</span></small>
 	  </div>
   </div>
@@ -35,8 +35,8 @@
   <div class="form-group row">
     <label for="emailReg" class="col-sm-2 col-form-label text-right">Email</label>
 	  <div class="col-sm-10">
-      <input type="email" class="form-control" name="emailReg" id="emailReg" placeholder="Enter your email address" required>
-      <small class="form-text text-muted"><span class="text-danger">* Required</span></small>
+      <input type="email" class="form-control" name="emailReg" id="emailReg" placeholder="Enter your email address" onblur="checkEmailUniqueLive()" required>
+      <small class="form-text text-muted"><span class="text-danger" id="emailHelpText">* Required</span></small>
 	  </div>
   </div> 
 
@@ -190,10 +190,10 @@
 
 <!-- *** JavaScript *** -->
 
-<!-- Script (AJAX) incl. 2 functions for checking username is unique -->
+<!-- Script (AJAX) incl. 3 functions for checking username and email are both unique -->
 <script>
 
-function checkUniqueLive() { 
+function checkUsernameUniqueLive() { 
   var username = $('#username').val();
   var username_info = $('#usernameHelpText');
   var outcome = '';
@@ -228,17 +228,62 @@ function checkUniqueLive() {
   }
 }
 
-function checkUniqueSubmit() { 
-  var username = $('#username').val();
-  var outcome = checkUniqueLive(username);
+function checkEmailUniqueLive() { 
+  var email = $('#emailReg').val();
+  var email_info = $('#emailHelpText');
+  var outcome = '';
+  $.ajax({ 
+    url: "php/check_email.php", 
+    async: false,
+    data: {"email": email},
+    type: "POST",
+    success: function (data) {
+      if (data == 'unique') {
+        outcome = 'unique';
+      }
+      else if (data == 'not_unique') {
+        outcome = 'not_unique';
+      }
+      else if (data == 'failure') {
+        outcome = 'failure';
+      }
+    }
+  });
   if (outcome == 'unique') {
-    return true;
+    email_info.html('* Required &nbsp &nbsp</span><span class="bg-success text-white">&nbspUnique&nbsp</span>');
+    return outcome;
   }
   else if (outcome == 'not_unique') {
+    email_info.html('* Required &nbsp &nbsp</span><span class="bg-warning text-dark">&nbspEmail already in use&nbsp</span>');
+    return outcome;
+  }
+  else if (outcome == 'failure') {
+    email_info.html('* Required &nbsp &nbsp</span><span class="bg-warning text-dark">&nbspError connecting to the database. If this issue persists, please refresh the page.&nbsp</span>');
+    return outcome;
+  }
+}
+
+function checkUniqueSubmit() { 
+  var username = $('#username').val();
+  var outcome_username = checkUsernameUniqueLive(username);
+  var email = $('#emailReg').val();
+  var outcome_email = checkEmailUniqueLive(email);
+  if (outcome_username == 'unique' && outcome_email == 'unique') {
+    return true;
+  }
+  else if (outcome_username == 'not_unique' && outcome_email == 'unique') {
     alert('That username is already in use.\nPlease pick another.');
     return false;
   }
-  else if (outcome == 'failure') {
+  else if (outcome_username == 'unique' && outcome_email == 'not_unique') {
+    alert('That email is already in use.\nPlease pick another.');
+    return false;
+  }
+  else if (outcome_username == 'not_unique' && outcome_email == 'not_unique') {
+    alert('Both the username and email you entered are already in use.\nPlease pick different ones.');
+    return false;
+  }
+  else if (outcome_username == 'failure' || outcome_email == 'failure') {
     alert('There was an error connecting to the database.\nIf this issue persists, please refresh the page.');
     return false;
   }
