@@ -166,7 +166,7 @@
   <div class="col-sm-4"> <!-- Right col with bidding info -->
 
 	<?php if ($now >= $end_time && $current_price >= $reserve_price): ?>
-		<p>This auction ended on <?php echo(date_format($end_time, 'j M H:i')) ?>.</p>
+		<span class="bg-warning text-dark">This auction ended on <?php echo(date_format($end_time, 'j M H:i')) ?>.</span>
 		<hr class="rounded">
 		<p class="lead">The item was sold for £<?php echo(number_format($current_price, 2)) ?>.</p>
 		<div class="card">
@@ -181,7 +181,7 @@
 		</div>	
 	
 	<?php elseif ($now >= $end_time && $current_price < $reserve_price): ?>
-		<p>This auction ended on <?php echo(date_format($end_time, 'j M H:i')) ?>.</p>
+		<span class="bg-warning text-dark">This auction ended on <?php echo(date_format($end_time, 'j M H:i')) ?>.</span>
 		<hr class="rounded">
 		<p class="lead">The reserve price was not reached and the item was not sold.</p>
 		<div class="card">
@@ -196,7 +196,7 @@
 		</div>
 	 
 	<?php else: ?>
-		<p>Auction ends <?php echo(date_format($end_time, 'j M H:i') . $time_remaining) ?></p> 
+		<span class="bg-success text-white">Auction ends <?php echo(date_format($end_time, 'j M H:i') . $time_remaining) ?></span> 
 		<hr class="rounded">	
 		<p class="lead">Starting price: £<?php echo(number_format($start_price, 2)) ?></p>
 		<p class="lead">Minimum increment: £<?php echo(number_format($min_increment, 2)) ?></p>
