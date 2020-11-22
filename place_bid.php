@@ -148,7 +148,7 @@
 			<button type="button" class="btn btn-outline-secondary btn-sm" onclick="addToWatchlist()">+ Add to watchlist</button>	
 		</div>
 		<div id="watch_watching" style="display: none">
-			<h5>Auction addded to watchlist successfully!</h5>	
+			<h5>Auction added to watchlist successfully!</h5>	
 		</div>
 	<?php endif ?>
 <?php elseif ($bid_success == 0): ?>
