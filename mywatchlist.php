@@ -58,7 +58,7 @@
         $productID = $record['auctionID'];
         if ($now < $end_time) {
           $time_to_end = date_diff($now, $end_time);
-          $productTimeLeft = " Auction ends in " . display_time_remaining($time_to_end);
+          $productTimeLeft = "Auction ends in " . display_time_remaining($time_to_end);
 		  $timeLeftFormat = "badge badge-success";
         }
         else {
