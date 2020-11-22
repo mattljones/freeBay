@@ -28,7 +28,7 @@ if (!isset($_SESSION['account_type']) || $_SESSION['account_type'] != 'seller') 
         <div class="form-group row">
           <label for="auctionDetails" class="col-sm-2 col-form-label text-right">Details</label>
           <div class="col-sm-10">
-            <textarea class="form-control" id="auctionDetails" name="Details" rows="4" pattern=".{10,4000}" required="required"></textarea>
+            <textarea class="form-control" id="auctionDetails" name="Details" rows="4" minlength="10" maxlength="4000" required="required"></textarea>
             <small id="detailsHelp" class="form-text text-muted"><span class="text-danger">* Required.</span> Full details of the listing to help bidders decide if they're interested. Minimum 10 characters.</small>
           </div>
         </div>
