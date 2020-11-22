@@ -174,6 +174,8 @@ $sellerID=$_SESSION['userID'];
       $bidsChecked2 = "";
       $watchersChecked1 = "";
       $watchersChecked2 = "";
+      $endingSoonChecked ="";
+      $endingLaterChecked ="";
       if (isset($_POST['checkedOrder'])) {
         if (in_array("checkLowPrice", $_POST['checkedOrder'])) {
           $priceChecked1 = "checked";
@@ -344,7 +346,7 @@ $sellerID=$_SESSION['userID'];
         $cardStatusFormat = "";
         if ($now < $end_time) {
           $time_to_end = date_diff($now, $end_time);
-          $productTimeLeft = ' Auction will end in ' . display_time_remaining($time_to_end) . '';
+          $productTimeLeft = '<span class="badge badge-success">Auction ends in ' . display_time_remaining($time_to_end) . '</span>';
         } else {
           $productTimeLeft = '<span class="badge badge-warning">Auction Ended</span>';
           if (($productCurrentPrice < $productReservePrice) or ($productBidders == 0)) {
