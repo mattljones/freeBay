@@ -28,10 +28,10 @@
   
   // Get relevant information about the auction
   $sql_1 = "SELECT a.title, a.descript, a.startDate, a.endDate, a.startPrice, a.reservePrice, a.minIncrement, c.categoryName, s.username, s.sellerID
-			FROM Auctions a
-			LEFT JOIN Categories c ON a.categoryID = c.categoryID
-			LEFT JOIN Sellers s ON a.sellerID = s.sellerID
-			WHERE auctionID = '$auction_id'; ";
+			      FROM Auctions a
+		      	LEFT JOIN Categories c ON a.categoryID = c.categoryID
+		      	LEFT JOIN Sellers s ON a.sellerID = s.sellerID
+		      	WHERE auctionID = '$auction_id'; ";
   $result = $conn->query($sql_1)->fetch_row() ?? false;
   $title = $result[0];
   $description = $result[1];
@@ -52,17 +52,17 @@
   
   // Get current price and number of bids
   $sql_2 = "SELECT max(bidAmount), count(bidID) 
-			FROM Bids 
-			WHERE auctionID = '$auction_id';";
+			      FROM Bids 
+		      	WHERE auctionID = '$auction_id';";
   $result = $conn->query($sql_2)->fetch_row() ?? false;
   $current_price = floatval($result[0]);
   $num_bids = $result[1];
     
   // Get bid history and put it in a table
   $sql_3 = "SELECT bidDate, username, bidAmount 
-			FROM Bids, Buyers 
-			WHERE bids.buyerID = buyers.buyerID AND auctionID = '$auction_id' 
-			ORDER BY bidDate;";
+		      	FROM Bids, Buyers 
+		      	WHERE bids.buyerID = buyers.buyerID AND auctionID = '$auction_id' 
+		      	ORDER BY bidDate;";
   $result = $conn->query($sql_3) ?? false;
   
   $table = '<table border="1" cellspacing="1" cellpadding="4">
@@ -75,15 +75,15 @@
     $table .= '<tr>
                 <td>'.$val['bidDate'].'</td>
                 <td>'.$val['username'].'</td> 
-                <td>'.$val['bidAmount'].'</td>
+                <td>£'.$val['bidAmount'].'</td>
               </tr>';
 	}
   $table .= '</table>'; 
   
   // Get number of watchers
   $sql_4 = "SELECT count(buyerID) 
-			FROM watching 
-			WHERE auctionID = '$auction_id';";
+			      FROM watching 
+		      	WHERE auctionID = '$auction_id';";
   $result = $conn->query($sql_4)->fetch_row() ?? false;
   $num_watchers = $result[0];  
   
@@ -91,8 +91,8 @@
   // If the user has a session, determine if the user is already watching this item.
   if ($has_session == true) {
 	$sql_5 = "SELECT count(buyerID) 
-			  FROM Watching 
-			  WHERE auctionID = '$auction_id' AND buyerID = '$user_id';";
+			      FROM Watching 
+			      WHERE auctionID = '$auction_id' AND buyerID = '$user_id';";
 	$result = $conn->query($sql_5)->fetch_row() ?? false;
 	if ($result[0] == 1) {
 		$watching = true;
@@ -154,7 +154,7 @@
 <div class="row"> <!-- Row #2 with auction description + bidding info -->
   <div class="col-sm-8"> <!-- Left col with item info -->
 	
-	<h5 class="my-3">Category: <?php echo($category); ?> | Seller: <?php echo($seller_username); ?> </h5>
+	<h5 class="my-3">Category:<span style="font-weight:normal"> <?php echo($category); ?></span>&nbsp | &nbspSeller:<span style="font-weight:normal"> <?php echo($seller_username); ?></span> </h5>
    <!-- <div class="itemDescription">Description: <?php echo($description); ?></div>-->
     <div class="card">
 		<h5 class="card-header">Description</h5>
@@ -242,9 +242,195 @@
 </div> <!-- End of row #2 -->
 </div>
 
+<!-- Recommendations based on which auctions users who are watching this auction are also watching -->
+<br><br>
+<div class="container">
+
+<?php 
+
+$connection = mysqli_connect(host, username, password, database);
+
+if (!$connection) { 
+  die();
+}
+
+$auction_id = $_GET['auctionID'];
+$current_time = date("Y-m-d H:i:s");
+
+// Set buyerID to the session variable 'userID' if the individual is logged in as a buyer, and blank otherwise (since used in QUERY 1)
+if (isset($_SESSION['account_type']) && $_SESSION['account_type'] == 'buyer') {
+  $buyer_id = $_SESSION['userID'];
+}
+else {
+  $buyer_id = '';
+}
+
+// QUERY 1 - Returns list of buyers (or, if logged in as a buyer, other buyers) watching this auction
+// NB: unlike in recommendations.php, does not need to ignore buyerID '1' as watch history is deleted when buyer accounts are deleted (see report for details)
+$query_buyers = "SELECT buyerID
+                 FROM Watching
+                 WHERE auctionID = '$auction_id'
+                 AND buyerID != '$buyer_id'";
+
+// QUERY 2 - Returns a table with two columns:
+// 1. A list of active auctions (excluding current auction) which watchers of this auction (excluding current user if logged in as a bidder) are also watching
+// 2. A count of the number of buyers watching that auction (its 'score')
+$query_auctions = "SELECT auctionID, COUNT(buyerID) as score
+                   FROM Watching AS w
+                   WHERE buyerID IN ($query_buyers)
+                   AND auctionID != '$auction_id'
+                   AND '$current_time' < (SELECT endDate
+                                          FROM Auctions
+                                          WHERE auctionID = w.auctionID)
+                   GROUP BY auctionID
+                   ORDER BY score DESC
+                   LIMIT 5";
+
+$recommendations = mysqli_query($connection, $query_auctions);
+
+if (!$recommendations) { // Do not generate the section at all if an error is encountered (since not crucial to the page)
+  mysqli_close($connection);
+  die();
+}
+
+else { // Do not generate the section at all if there are no recommendations to give (possible for newer auctions with few or no watchers)
+
+  if (mysqli_num_rows($recommendations) == 0) {
+    mysqli_close($connection);
+    die();
+  }
+
+  else { // Generate the carousel of recommendations
+    echo '<h5 class="my-3 text-center"><span style="font-weight:normal"><i>You might also be interested in...</i></span></h5>';
+    echo '
+         <div id="carousel" class="carousel slide w-50 mx-auto" data-interval="false" data-ride="carousel">
+
+           <a class="carousel-control-prev w-auto" href="#carousel" role="button" data-slide="prev">
+             <span class="carousel-control-prev-icon bg-dark" aria-hidden="true"></span>
+             <span class="sr-only">Previous</span>
+           </a>
+
+           <a class="carousel-control-next w-auto" href="#carousel" role="button" data-slide="next">
+             <span class="carousel-control-next-icon bg-dark" aria-hidden="true"></span>
+             <span class="sr-only">Next</span>
+           </a>
+         
+           <div class="carousel-inner w-80" role="listbox">';
+    $rank = 1;
+    while ($row = mysqli_fetch_array($recommendations)) {
+      // Retrieving auction title
+      $auctionID = $row['auctionID'];
+      $query_1 = "SELECT title, endDate, startPrice, sellerID, categoryID FROM Auctions WHERE auctionID = '$auctionID'";
+      $result_1 = mysqli_query($connection, $query_1);
+      $result_1_row = mysqli_fetch_array($result_1);
+      $title = $result_1_row['title'];
+      $endDate = new DateTime($result_1_row['endDate']);
+      $startPrice = $result_1_row['startPrice'];
+      $sellerID = $result_1_row['sellerID'];
+      $categoryID = $result_1_row['categoryID'];
+      // Retrieving auction category
+      $query_2 = "SELECT categoryName FROM Categories WHERE categoryID = '$categoryID'";
+      $result_2 = mysqli_query($connection, $query_2);
+      $categoryName = mysqli_fetch_array($result_2)['categoryName'];
+      // Retrieving seller username
+      $query_3 = "SELECT username FROM Sellers WHERE sellerID = '$sellerID'";
+      $result_3 = mysqli_query($connection, $query_3);
+      $username = mysqli_fetch_array($result_3)['username'];
+      // Retrieving current price
+      $query_4 = "SELECT MAX(bidAmount) AS maxBid FROM Bids WHERE auctionID = '$auctionID'"; // Checking to see if there have been any bids yet
+      $result_4 = mysqli_query($connection, $query_4);
+      $result_4_row = mysqli_fetch_array($result_4);
+      if (is_null($result_4_row['maxBid'])) {
+        $currentPrice = number_format($startPrice, 2); // Recommended auctions are not guaranteed to have a bid (unlike in recommendations.php)
+      }
+      else {
+        $currentPrice = number_format($result_4_row['maxBid'], 2);  
+      }
+      // Calculating time remaining
+      $now = new DateTime();
+      $timeDelta = date_diff($now, $endDate);
+      $timeRemaining = display_time_remaining($timeDelta);
+
+      if (!$result_1 || !$result_2 || !$result_3 || !$result_4) {
+        echo '<p>Recommendations are currently unavailable for this auction.</p>';
+        mysqli_close($connection);
+        die();
+      }
+
+      else {
+        if ($rank == 1) {
+          echo '
+               <div class="carousel-item active">
+          
+                 <div class="card" style="margin-left: 10%; margin-right: 10%; margin-top: 0.5%; margin-bottom: 0.5%">
+         
+                   <div class="card-header">
+                     <span style="font-size: 14px;">'.$categoryName.'</span>
+                   </div>
+
+                   <div class="card-body">
+                     <h5 class="card-title">'.$title.'</h5>
+                     <p class="card-text">Auction will end in '.$timeRemaining.'</p>
+                   </div>
+
+                   <div class="card-footer">
+                     <div class="buy d-flex justify-content-between align-items-center">
+                       <div class="price text-success">
+                         <h5 class="mt-4">£'.$currentPrice.'</h5>
+                       </div>
+                     <a href="listing.php?auctionID='.$auctionID.'" class="btn btn-outline-primary text-center">View Item</a>
+                     </div>
+                     <span class="text-info"><b>Seller: </b>'.$username.'</span>
+                   </div>
+
+                 </div>
+                 
+               </div>';
+          $rank += 1;
+        }
+
+        else {
+        echo '      
+             <div class="carousel-item">
+      
+               <div class="card" style="margin-left: 10%; margin-right: 10%; margin-top: 0.5%; margin-bottom: 0.5%">
+      
+                 <div class="card-header">
+                   <span style="font-size: 14px;">'.$categoryName.'</span>
+                 </div>
+
+                 <div class="card-body">
+                   <h5 class="card-title">'.$title.'</h5>
+                   <p class="card-text">Auction will end in '.$timeRemaining.'</p>
+                 </div>
+
+                 <div class="card-footer">
+                   <div class="buy d-flex justify-content-between align-items-center">
+                     <div class="price text-success">
+                       <h5 class="mt-4">£'.$currentPrice.'</h5>
+                     </div>
+                   <a href="listing.php?auctionID='.$auctionID.'" class="btn btn-outline-primary text-center">View Item</a>
+                   </div>
+                   <span class="text-info"><b>Seller: </b>'.$username.'</span>
+                 </div>
+
+               </div>
+
+            </div>';
+        }
+      }
+    }
+  echo '</div></div></div>';
+  mysqli_close($connection);
+  }
+}
+
+?>
+
+<br><br>
+</div>
 
 <?php include_once("footer.php")?>
-
 
 <script> 
 // Function to validate the bid amount input
