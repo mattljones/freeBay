@@ -242,8 +242,10 @@
 </div> <!-- End of row #2 -->
 </div>
 
-<!-- Recommendations based on which auctions users who are watching this auction are also watching -->
-<br><br>
+<!-- RECOMMENDATIONS (based on which auctions users who are watching this auction are also watching) -->
+
+<br>
+<br>
 <div class="container">
 
 <?php 
@@ -251,10 +253,9 @@
 $connection = mysqli_connect(host, username, password, database);
 
 if (!$connection) { 
-  die();
 }
 
-$auction_id = $_GET['auctionID'];
+$this_auction_id = $_GET['auctionID'];
 $current_time = date("Y-m-d H:i:s");
 
 // Set buyerID to the session variable 'userID' if the individual is logged in as a buyer, and blank otherwise (since used in QUERY 1)
@@ -269,7 +270,7 @@ else {
 // NB: unlike in recommendations.php, does not need to ignore buyerID '1' as watch history is deleted when buyer accounts are deleted (see report for details)
 $query_buyers = "SELECT buyerID
                  FROM Watching
-                 WHERE auctionID = '$auction_id'
+                 WHERE auctionID = '$this_auction_id'
                  AND buyerID != '$buyer_id'";
 
 // QUERY 2 - Returns a table with two columns:
@@ -278,7 +279,7 @@ $query_buyers = "SELECT buyerID
 $query_auctions = "SELECT auctionID, COUNT(buyerID) as score
                    FROM Watching AS w
                    WHERE buyerID IN ($query_buyers)
-                   AND auctionID != '$auction_id'
+                   AND auctionID != '$this_auction_id'
                    AND '$current_time' < (SELECT endDate
                                           FROM Auctions
                                           WHERE auctionID = w.auctionID)
@@ -290,14 +291,12 @@ $recommendations = mysqli_query($connection, $query_auctions);
 
 if (!$recommendations) { // Do not generate the section at all if an error is encountered (since not crucial to the page)
   mysqli_close($connection);
-  die();
 }
 
 else { // Do not generate the section at all if there are no recommendations to give (possible for newer auctions with few or no watchers)
 
   if (mysqli_num_rows($recommendations) == 0) {
     mysqli_close($connection);
-    die();
   }
 
   else { // Generate the carousel of recommendations
@@ -319,11 +318,11 @@ else { // Do not generate the section at all if there are no recommendations to 
     $rank = 1;
     while ($row = mysqli_fetch_array($recommendations)) {
       // Retrieving auction title
-      $auctionID = $row['auctionID'];
-      $query_1 = "SELECT title, endDate, startPrice, sellerID, categoryID FROM Auctions WHERE auctionID = '$auctionID'";
+      $auctionID_rec = $row['auctionID'];
+      $query_1 = "SELECT title, endDate, startPrice, sellerID, categoryID FROM Auctions WHERE auctionID = '$auctionID_rec'";
       $result_1 = mysqli_query($connection, $query_1);
       $result_1_row = mysqli_fetch_array($result_1);
-      $title = $result_1_row['title'];
+      $title_rec = $result_1_row['title'];
       $endDate = new DateTime($result_1_row['endDate']);
       $startPrice = $result_1_row['startPrice'];
       $sellerID = $result_1_row['sellerID'];
@@ -335,9 +334,9 @@ else { // Do not generate the section at all if there are no recommendations to 
       // Retrieving seller username
       $query_3 = "SELECT username FROM Sellers WHERE sellerID = '$sellerID'";
       $result_3 = mysqli_query($connection, $query_3);
-      $username = mysqli_fetch_array($result_3)['username'];
+      $username_seller = mysqli_fetch_array($result_3)['username'];
       // Retrieving current price
-      $query_4 = "SELECT MAX(bidAmount) AS maxBid FROM Bids WHERE auctionID = '$auctionID'"; // Checking to see if there have been any bids yet
+      $query_4 = "SELECT MAX(bidAmount) AS maxBid FROM Bids WHERE auctionID = '$auctionID_rec'"; // Checking to see if there have been any bids yet
       $result_4 = mysqli_query($connection, $query_4);
       $result_4_row = mysqli_fetch_array($result_4);
       if (is_null($result_4_row['maxBid'])) {
@@ -347,14 +346,13 @@ else { // Do not generate the section at all if there are no recommendations to 
         $currentPrice = number_format($result_4_row['maxBid'], 2);  
       }
       // Calculating time remaining
-      $now = new DateTime();
-      $timeDelta = date_diff($now, $endDate);
+      $time_now = new DateTime();
+      $timeDelta = date_diff($time_now, $endDate);
       $timeRemaining = display_time_remaining($timeDelta);
 
       if (!$result_1 || !$result_2 || !$result_3 || !$result_4) {
         echo '<p>Recommendations are currently unavailable for this auction.</p>';
         mysqli_close($connection);
-        die();
       }
 
       else {
@@ -369,7 +367,7 @@ else { // Do not generate the section at all if there are no recommendations to 
                    </div>
 
                    <div class="card-body">
-                     <h5 class="card-title">'.$title.'</h5>
+                     <h5 class="card-title">'.$title_rec.'</h5>
                      <p class="card-text">Auction will end in '.$timeRemaining.'</p>
                    </div>
 
@@ -378,9 +376,9 @@ else { // Do not generate the section at all if there are no recommendations to 
                        <div class="price text-success">
                          <h5 class="mt-4">£'.$currentPrice.'</h5>
                        </div>
-                     <a href="listing.php?auctionID='.$auctionID.'" class="btn btn-outline-primary text-center">View Item</a>
+                     <a href="listing.php?auctionID='.$auctionID_rec.'" class="btn btn-outline-primary text-center">View Item</a>
                      </div>
-                     <span class="text-info"><b>Seller: </b>'.$username.'</span>
+                     <span class="text-info"><b>Seller: </b>'.$username_seller.'</span>
                    </div>
 
                  </div>
@@ -400,7 +398,7 @@ else { // Do not generate the section at all if there are no recommendations to 
                  </div>
 
                  <div class="card-body">
-                   <h5 class="card-title">'.$title.'</h5>
+                   <h5 class="card-title">'.$title_rec.'</h5>
                    <p class="card-text">Auction will end in '.$timeRemaining.'</p>
                  </div>
 
@@ -409,9 +407,9 @@ else { // Do not generate the section at all if there are no recommendations to 
                      <div class="price text-success">
                        <h5 class="mt-4">£'.$currentPrice.'</h5>
                      </div>
-                   <a href="listing.php?auctionID='.$auctionID.'" class="btn btn-outline-primary text-center">View Item</a>
+                   <a href="listing.php?auctionID='.$auctionID_rec.'" class="btn btn-outline-primary text-center">View Item</a>
                    </div>
-                   <span class="text-info"><b>Seller: </b>'.$username.'</span>
+                   <span class="text-info"><b>Seller: </b>'.$username_seller.'</span>
                  </div>
 
                </div>
@@ -420,14 +418,15 @@ else { // Do not generate the section at all if there are no recommendations to 
         }
       }
     }
-  echo '</div></div></div>';
+  echo '</div></div>';
   mysqli_close($connection);
   }
 }
 
 ?>
 
-<br><br>
+<br>
+<br>
 </div>
 
 <?php include_once("footer.php")?>
