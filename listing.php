@@ -166,7 +166,7 @@
   <div class="col-sm-4"> <!-- Right col with bidding info -->
 
 	<?php if ($now >= $end_time && $current_price >= $reserve_price): ?>
-		<span class="badge badge-warning">This auction ended on <?php echo(date_format($end_time, 'j M H:i')) ?>.</span>
+		<span class="badge badge-warning">This auction ended on <?php echo(date_format($end_time, 'j M H:i')) ?></span>
 		<hr class="rounded">
 		<p class="lead">The item was sold for £<?php echo(number_format($current_price, 2)) ?>.</p>
 		<div class="card">
@@ -181,7 +181,7 @@
 		</div>	
 	
 	<?php elseif ($now >= $end_time && $current_price < $reserve_price): ?>
-		<span class="badge badge-warning">This auction ended on <?php echo(date_format($end_time, 'j M H:i')) ?>.</span>
+		<span class="badge badge-warning">This auction ended on <?php echo(date_format($end_time, 'j M H:i')) ?></span>
 		<hr class="rounded">
 		<p class="lead">The reserve price was not reached and the item was not sold.</p>
 		<div class="card">
