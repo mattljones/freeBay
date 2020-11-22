@@ -174,6 +174,8 @@ $sellerID=$_SESSION['userID'];
       $bidsChecked2 = "";
       $watchersChecked1 = "";
       $watchersChecked2 = "";
+      $endingSoonChecked ="";
+      $endingLaterChecked ="";
       if (isset($_POST['checkedOrder'])) {
         if (in_array("checkLowPrice", $_POST['checkedOrder'])) {
           $priceChecked1 = "checked";
