@@ -72,12 +72,11 @@ else { // Providing an explanation for a blank page (possible for bidders who ha
     while ($row = mysqli_fetch_array($recommendations)) {
       // Retrieving auction title
       $auctionID = $row['auctionID'];
-      $query_1 = "SELECT title, endDate, startPrice, sellerID, categoryID FROM Auctions WHERE auctionID = '$auctionID'";
+      $query_1 = "SELECT title, endDate, sellerID, categoryID FROM Auctions WHERE auctionID = '$auctionID'";
       $result_1 = mysqli_query($connection, $query_1);
       $result_1_row = mysqli_fetch_array($result_1);
       $title = $result_1_row['title'];
       $endDate = new DateTime($result_1_row['endDate']);
-      $startPrice = $result_1_row['startPrice'];
       $sellerID = $result_1_row['sellerID'];
       $categoryID = $result_1_row['categoryID'];
       // Retrieving auction category
