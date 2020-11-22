@@ -54,10 +54,6 @@
       $allCompletedChecked = "";
       $soldCompletedChecked = "";
       $unSoldCompletedChecked = "";
-      $endingSoonChecked = "";
-      $endingLaterChecked = "";
-      $newListChecked = "";
-      $oldListChecked = "";
       //Checks when a certain radio box is ticked so it is retained when searching
       if (isset($_POST['checkedStatus'])) {
         if (in_array("checkActive", $_POST['checkedStatus'])) {
@@ -76,6 +72,7 @@
         }
       }
       ?>
+      <!-- The radio boxes for the active/completed listings -->
       <div class="form-group" style="margin-bottom: 1rem">
         <div class="form-check">
           <input class="form-check-input" type="radio" value="checkActive" id="showActive1" name="checkedStatus[]" <?php echo $activeChecked1 ?>>
@@ -96,6 +93,7 @@
         <button type="submit" class="btn btn-outline-primary" style="margin-left: 0.5%">Apply</button>
       </div>
       <hr>
+      <!-- The categories section to allow the user to filter -->
       <h2>Categories</h2>
       <div class="list-group">
         <div id="categories-filter">
@@ -106,6 +104,7 @@
           $result = mysqli_query($conn, $sql) or die("database error:" . mysqli_error($conn));
           $row = mysqli_fetch_array($result, MYSQLI_NUM);
           $counter = 0;
+          // Loops through the SQL database to populate the different types of categories
           while ($row = mysqli_fetch_array($result)) {
             $checked = "";
             $categoryName = $row['categoryName'];
@@ -141,6 +140,10 @@
       $bidsChecked2 = "";
       $watchersChecked1 = "";
       $watchersChecked2 = "";
+      $endingSoonChecked = "";
+      $endingLaterChecked = "";
+      $newListChecked = "";
+      $oldListChecked = "";
       if (isset($_POST['checkedOrder'])) {
         if (in_array("checkLowPrice", $_POST['checkedOrder'])) {
           $priceChecked1 = "checked";
@@ -313,22 +316,27 @@
         $productBidders = $record['noOfBidders'];
         $productWatchers = $record['noOfWatching'];
         $productSeller = $record['sellerUsername'];
-
-        #$result3 = $conn->query($sql3)->fetch_assoc() ?? false;
         $productCurrentPrice = $record['maxBid'];
-        #print($productCurrentPrice);
-        #print_r($result);
-        #$recordBids = mysqli_fetch_assoc($result);
+        $productStartDate = new DateTime($record['startDate']);
         $end_time = new DateTime($record['endDate']);
         $now = new DateTime();
         $productID = $record['auctionID'];
-
+        
 
         #Card formatting doesn't change if it has not sold
         $cardStatusFormat = "";
+        $numberOfDaysSinceListed = $now->diff($productStartDate)->days;
+        if ($numberOfDaysSinceListed <= 1) {
+          $checkNewListing = True;
+          $badgeNewListing = '<span class="badge badge-secondary">New</span>';
+        }
+        else {
+          $checkNewListing = False;
+          $badgeNewListing = '';
+        }
         if ($now < $end_time) {
           $time_to_end = date_diff($now, $end_time);
-          $productTimeLeft = '<span class="badge badge-success">Auction ends in ' . display_time_remaining($time_to_end) . '</span>';
+          $productTimeLeft ='<span class="badge badge-success">Auction ends in ' . display_time_remaining($time_to_end) . '</span>' . " " . $badgeNewListing;
         } else {
           $productTimeLeft = '<span class="badge badge-warning">Auction Ended</span>';
           if (($productCurrentPrice < $productReservePrice) or ($productBidders == 0)) {
@@ -400,15 +408,6 @@
     $("input[type='radio']:checked").prop("checked", false)
   }
   $('#checkAll').on('click', uncheckAll)
-
-  // $(document).ready(function() {
-  //   $('#searchbox').on("keyup", function() {
-  //     var value = $(this).val().toLowerCase();
-  //     $(".card").filter(function() {
-  //       $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-  //     });
-  //   });
-  // });
 
   $(document).ready(function() {
     $('#update_indication_id').on("change", function() {
