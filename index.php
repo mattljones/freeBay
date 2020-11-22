@@ -347,7 +347,18 @@
             $cardStatusFormat = "border-success mb-3";
           }
         }
-
+        if (strlen($productTitle) > 79) {
+          $titleSuffix = "...";
+        }
+        else {
+          $titleSuffix = "";
+        }
+        if (strlen($productDescript) > 300) {
+          $descriptSuffix = "...";
+        }
+        else {
+          $descriptSuffix = "";
+        }
 
         #if ($productCurrentPrice == false) {
         #  $productCurrentPrice = $productStartPrice;
@@ -365,9 +376,9 @@
           </div>
 
           <div class="card-body">
-            <h5 class="card-title"><?php echo $productTitle ?></h5>
+            <h5 class="card-title"><?php echo substr($productTitle, 0, 80) . $titleSuffix?></h5>
             <!--<p class="card-text">Category: <?php echo $productCategory ?></p>-->
-            <p class="card-text"><?php echo $productDescript ?></p>
+            <p class="card-text"><?php echo substr($productDescript,0,300) . $descriptSuffix ?></p>
             <p class="card-text"><?php echo $productTimeLeft ?></p>
             <!-- <a href="listing.php?auctionID=<?= $productID ?>" type="submit" class="btn btn-outline-primary text-center">View Item</a> -->
           </div>
