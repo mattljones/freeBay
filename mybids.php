@@ -343,17 +343,17 @@
 				ORDER BY bidDate ";
 		$result = $conn->query($sql_3) ?? false;
 		  
-		$tableBids = '<table id="bidsTable' . $productID  . '" border="1" cellspacing="1" cellpadding="4" class="collapse">
-				<tr>
+		$tableBids = '<table class="table table-hover collapse" id="bidsTable' . $productID  . '">
+				<thead class="thead-light">
 				<th>Bid Date</th>
 				<th>Username</th> 
 				<th>Bid Amount</th>
-				</tr>';
+				</thead>';
 		foreach($result as $val){
 			$tableBids .= '<tr>
 					<td>'.$val['bidDate'].'</td>
 					<td>'.$val['username'].'</td> 
-					<td>'.$val['bidAmount'].'</td>
+					<td>£'.number_format($val['bidAmount'], 2).'</td>
 					 </tr>';
 		}
 		$tableBids .= '</table>'; 

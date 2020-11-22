@@ -65,17 +65,17 @@
 		      	ORDER BY bidDate;";
   $result = $conn->query($sql_3) ?? false;
   
-  $table = '<table border="1" cellspacing="1" cellpadding="4">
-          <tr>
+  $table = '<table class="table table-hover">
+          <thead class="thead-light">
             <th>Bid Date</th>
             <th>Username</th> 
             <th>Bid Amount</th>
-          </tr>';
+          </thead>';
   foreach($result as $val){
     $table .= '<tr>
                 <td>'.$val['bidDate'].'</td>
                 <td>'.$val['username'].'</td> 
-                <td>£'.$val['bidAmount'].'</td>
+                <td>£'.number_format($val['bidAmount'], 2).'</td>
               </tr>';
 	}
   $table .= '</table>'; 

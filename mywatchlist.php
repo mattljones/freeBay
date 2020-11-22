@@ -186,7 +186,7 @@
   </div>
    
   <div class="col-md-10">
-	<h2 class="my-3">My Watchlist</h2>
+	<h1>My Watchlist</h1>
 	<hr class="rounded">
     <div id="productCards" class="row">
       <?php
@@ -227,13 +227,13 @@
           $sql_1 .= " AND '$currentTime' < a.endDate AND (b.YourHighestBid = a.MaxBid)";
         }
         if (in_array("checkActive3", $_POST['checkedStatus'])) {
-          $sql_1 .= " AND '$currentTime' < a.endDate AND (b.YourHighestBid < a.MaxBid OR a.MaxBid IS NULL)";
+          $sql_1 .= " AND '$currentTime' < a.endDate AND (IFNULL(b.YourHighestBid, 0) < IFNULL(a.MaxBid, 0) OR a.MaxBid IS NULL)";
         }
         if (in_array("completedWonChecked", $_POST['checkedStatus'])) {
           $sql_1 .= " AND '$currentTime' > a.endDate AND (b.YourHighestBid = a.MaxBid)";
         }
         if (in_array("completedLostChecked", $_POST['checkedStatus'])) {
-          $sql_1 .= " AND '$currentTime' > a.endDate AND (b.YourHighestBid < a.MaxBid)";
+          $sql_1 .= " AND '$currentTime' > a.endDate AND (IFNULL(b.YourHighestBid, 0) < IFNULL(a.MaxBid, 0) OR a.MaxBid IS NULL)";
         }
       } else {
         $sql_1 .= " AND '$currentTime' < a.endDate";
@@ -259,7 +259,7 @@
 	  
  	  // Check if the user has any watched auctions
 	  if (mysqli_num_rows($resultset) == 0) {
-		echo "You haven't added any auctions to your watchlist yet!";
+		echo "No results found!";
 	  }
 	  
 	  // If the user has watched auctions, continue to show the relevant information
