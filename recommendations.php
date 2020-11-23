@@ -1,6 +1,7 @@
 <?php include_once("header.php")?>
 <?php require("utilities.php")?>
 
+<hr>
 <div class="container h-100">
 
 <?php   
@@ -14,7 +15,7 @@ require_once('private/database_credentials.php');
 $connection = mysqli_connect(host, username, password, database);
 
 if (!$connection) { 
-  echo '<h2 class="my-3">Unexpected error :(</h2>';
+  echo '<h1>Unexpected error :(</h1>';
   echo '<p>There was an error connecting to the database.</p><p>Please refresh the page or try again later.</p>';
   die();
 }
@@ -53,7 +54,7 @@ $query_auctions = "SELECT auctionID, COUNT(similarity) AS score
 $recommendations = mysqli_query($connection, $query_auctions);
 
 if (!$recommendations) {
-  echo '<h2 class="my-3">Unexpected error :(</h2>';
+  echo '<h1>Unexpected error :(</h1>';
   echo '<p>There was an error retrieving your recommendations.</p><p>Please refresh the page or try again later.</p>';
   mysqli_close($connection);
   die();
@@ -62,12 +63,12 @@ if (!$recommendations) {
 else { // Providing an explanation for a blank page (possible for bidders who haven't bid on many/any auctions); important not to give 'bad' recommendations
 
   if (mysqli_num_rows($recommendations) == 0) {
-    echo '<div class="row"><div class="col-sm-11"><h2 class="my-3">Our top recommendations for you</h2><hr class="rounded"></div></div>';
+    echo '<div class="row"><div class="col-sm-11"><h1>Our top recommendations for you</h1><hr class="rounded"></div></div>';
     echo '<p>We have no recommendations for you at this time.</p>';
   }
 
   else { // Generate the list of recommendations
-    echo '<div class="row"><div class="col-sm-11"><h2 class="my-3">Our top recommendations for you</h2><hr class="rounded"></div></div>';
+    echo '<div class="row"><div class="col-sm-11"><h1>Our top recommendations for you</h1><hr class="rounded"></div></div>';
     $rank = 1;
     while ($row = mysqli_fetch_array($recommendations)) {
       // Retrieving auction title
