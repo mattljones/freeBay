@@ -282,7 +282,7 @@ $query_auctions = "SELECT auctionID, COUNT(buyerID) as score
                    AND auctionID != '$this_auction_id'
                    AND '$current_time' > (SELECT startDate
                                           FROM Auctions
-                                          WHERE auctionID = b.auctionID)
+                                          WHERE auctionID = w.auctionID)
                    AND '$current_time' < (SELECT endDate
                                           FROM Auctions
                                           WHERE auctionID = w.auctionID)
