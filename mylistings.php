@@ -15,23 +15,6 @@ $sellerID=$_SESSION['userID'];
 <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="POST">
 
 
-
-<!-- BootStrap Toastie that notifies the search results-->
-<div aria-live="polite" aria-atomic="true" style="position: relative; min-height: 25px;">
-  <div class="toast hide" id="messageToast" style="position: absolute; top: 0; right: 0;" data-autohide="false">
-    <div class="toast-header">
-      <img src="assets/favicon.png" class="rounded mr-2" alt="fB">
-      <strong class="mr-auto">Search Results</strong>
-      <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div>
-    <div class="toast-body" id="messageHTMLToast">
-      The search has found <?php echo $num_rows ?> results.
-    </div>
-  </div>
-</div>
-
 <!-- The Listings-->
 <div class="row" style="margin:0;">
   <!-- The Filters of the page on the LHS -->
@@ -108,11 +91,11 @@ $sellerID=$_SESSION['userID'];
         </div>
         <div class="form-check">
           <input class="form-check-input" type="radio" value="checkActive2" id="showActive2" name="checkedStatus[]" <?php echo $activeChecked2 ?>>
-          <label class="form-check-label" for="showActive2">Show Active(met reserve price)</label>
+          <label class="form-check-label" for="showActive2">Show Active (Will sell)</label>
         </div>
         <div class="form-check">
           <input class="form-check-input" type="radio" value="checkActive3" id="showActive3" name="checkedStatus[]" <?php echo $activeChecked3 ?>>
-          <label class="form-check-label" for="showActive3">Show Active(not met reserve price)</label>
+          <label class="form-check-label" for="showActive3">Show Active (Might not sell)</label>
         </div>
         <div class="form-check">
           <input class="form-check-input" type="radio" value="checkScheduled" id="showScheduled" name="checkedStatus[]" <?php echo $scheduledChecked ?>>
@@ -263,13 +246,13 @@ $sellerID=$_SESSION['userID'];
       $currentTime = $currentTime->format('Y-m-d H:i:s');
       if (isset($_POST['checkedStatus'])) {
         if (in_array("checkActive", $_POST['checkedStatus'])) {
-          $sql .= " AND '$currentTime' < endDate";
+          $sql .= " AND '$currentTime' < endDate AND '$currentTime' > startDate";
         }
         if (in_array("checkActive2", $_POST['checkedStatus'])) {
-          $sql .= " AND '$currentTime' < endDate AND (maxBid >= reservePrice)";
+          $sql .= " AND '$currentTime' < endDate AND (maxBid >= reservePrice) AND '$currentTime' > startDate";
         }
         if (in_array("checkActive3", $_POST['checkedStatus'])) {
-          $sql .= " AND '$currentTime' < endDate AND (maxBid < reservePrice)";
+          $sql .= " AND '$currentTime' < endDate AND (maxBid < reservePrice) AND '$currentTime' > startDate";
         }
         if (in_array("checkScheduled", $_POST['checkedStatus'])) {
           $sql .= " AND '$currentTime' < startDate";
@@ -317,6 +300,10 @@ $sellerID=$_SESSION['userID'];
         }
       }
       $resultset = mysqli_query($conn, $sql) or die("database error:" . mysqli_error($conn));
+      // Check if the user has placed any listings
+	  if (mysqli_num_rows($resultset) == 0) {
+      echo "No results found!";
+      }
       $num_rows = mysqli_num_rows($resultset);
       while ($record = mysqli_fetch_assoc($resultset)) {
         $productAuctionID = $record['auctionID'];;
@@ -338,6 +325,7 @@ $sellerID=$_SESSION['userID'];
         #print_r($result);
         #$recordBids = mysqli_fetch_assoc($result);
         $end_time = new DateTime($record['endDate']);
+        $start_time= new DateTime($record['startDate']);
         $now = new DateTime();
         $productID = $record['auctionID'];
 
@@ -345,9 +333,13 @@ $sellerID=$_SESSION['userID'];
         #Card formatting doesn't change if it has not sold
         $cardStatusFormat = "";
         if ($now < $end_time) {
+          if($now < $start_time){
+          $time_to_end = date_diff($now, $start_time);
+          $productTimeLeft = '<span class="badge badge-primary">Auction starts in ' . display_time_remaining($time_to_end) . '</span>';
+        }else{
           $time_to_end = date_diff($now, $end_time);
           $productTimeLeft = '<span class="badge badge-success">Auction ends in ' . display_time_remaining($time_to_end) . '</span>';
-        } else {
+        }} else {
           $productTimeLeft = '<span class="badge badge-warning">Auction Ended</span>';
           if (($productCurrentPrice < $productReservePrice) or ($productBidders == 0)) {
             #Product didnt'sell so format of card will be red
@@ -358,6 +350,38 @@ $sellerID=$_SESSION['userID'];
           }
         }
 
+         // Determine the current state of the auction
+         $sql_2 = "SELECT a.auctionID,
+					b.bidAmount,
+					a.reservePrice,
+					b.buyerID,
+					bu.username
+				FROM Auctions a
+				JOIN Bids b ON a.auctionID = b.auctionID
+				JOIN Buyers bu ON b.buyerID = bu.buyerID
+        WHERE a.auctionID = '$productID' AND b.bidAmount = (SELECT MAX(bidAmount) FROM Bids WHERE auctionID = '$productID');";
+        $result_1 = $conn->query($sql_2)->fetch_row() ?? false;
+        $usernameHighestBidder = $result_1[4];
+        // Check if the auction has ended
+		    if ($now > $end_time) {
+          if (mysqli_num_rows($conn->query($sql_2)) == 0 || $result_1[1] < $result_1[2]){
+            $leadingBidder ='The item was not sold';
+          }else{
+            $leadingBidder = "Auction won by: " . $usernameHighestBidder . ".";
+          }
+        }
+        // The auction is still in progress  
+        if ($now <= $end_time && $now > $start_time){
+          if (mysqli_num_rows($conn->query($sql_2)) == 0){
+            $leadingBidder = "No bidders yet";
+          }else{
+            $leadingBidder = "Highest bidder: " . $usernameHighestBidder . ".";
+          }
+        }
+        // The auction is still scheduled
+        if ($now < $start_time){
+          $leadingBidder = "No bidders yet";
+        }
 
         #if ($productCurrentPrice == false) {
         #  $productCurrentPrice = $productStartPrice;
@@ -389,7 +413,7 @@ $sellerID=$_SESSION['userID'];
               <a href="listing.php?auctionID=<?= $productID ?>" type="submit" class="btn btn-outline-primary text-center">View Item</a>
               <!--<a href="#" class="btn btn-danger mt-3"><i class="fas fa-shopping-cart"></i> View Item</a>-->
             </div>
-            <span class="text-info"><b>Seller: </b><?= $productSeller ?></span>
+            <span class="text-info"><?= $leadingBidder ?></span>
           </div>
         </div>
       <?php   } ?>

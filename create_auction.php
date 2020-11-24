@@ -19,7 +19,7 @@ if (!isset($_SESSION['account_type']) || $_SESSION['account_type'] != 'seller') 
         <div class="form-group row">
           <label for="auctionTitle" class="col-sm-2 col-form-label text-right">Title of auction</label>
           <div class="col-sm-10">
-            <input type="text" class="form-control" id="auctionTitle" name="title" placeholder="e.g. Black mountain bike" pattern=".{10,80}" required="required">
+            <input type="text" class="form-control" id="auctionTitle" name="title" placeholder="e.g. Black mountain bike" minlength="10" maxlength="80" required="required">
             <small id="titleHelp" class="form-text text-muted"><span class="text-danger">* Required.</span> A short description of the item you're selling. Minimum 10 characters.</small>
           </div>
         </div>
