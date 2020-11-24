@@ -373,7 +373,7 @@ else { // Do not generate the section at all if there are no recommendations to 
 
                    <div class="card-body">
                      <h5 class="card-title">'.$title_rec.'</h5>
-                     <p class="card-text">Auction will end in '.$timeRemaining.'</p>
+                     <p class="badge badge-success">Auction ends in '.$timeRemaining.'</p>
                    </div>
 
                    <div class="card-footer">
@@ -404,7 +404,7 @@ else { // Do not generate the section at all if there are no recommendations to 
 
                  <div class="card-body">
                    <h5 class="card-title">'.$title_rec.'</h5>
-                   <p class="card-text">Auction will end in '.$timeRemaining.'</p>
+                   <p class="badge badge-success">Auction ends in '.$timeRemaining.'</p>
                  </div>
 
                  <div class="card-footer">

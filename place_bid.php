@@ -123,7 +123,7 @@
 			  //$auctionURL = 'http://' . htmlentities($_SERVER['HTTP_HOST']) . htmlentities(dirname($_SERVER['PHP_SELF'])) . '/listing.php?auctionID=' . $auction_id;
 			  $mail->isHTML(true);      // Set email format to HTML
 			  $mail->Subject = "$username, an auction from your watchlist has received a new bid!";
-			  $mail->Body    = "Auction <b>$auction_title</b> has received a bid of <b>£$bid_amount</b> by user <b>$buyer_username</b><br>$outbid"; 
+			  $mail->Body    = "Auction <b>$auction_title</b> has received a bid of <b>£" . number_format($bid_amount, 2) . "</b> by user <b>$buyer_username</b><br>$outbid"; 
 			  $mail->send();
 
 		  } catch (Exception $e) {
