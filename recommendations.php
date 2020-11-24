@@ -44,6 +44,9 @@ $query_auctions = "SELECT auctionID, COUNT(similarity) AS score
                    FROM Bids AS b, ($query_other_bidders) AS q
                    WHERE b.buyerID = q.buyerID
                    AND b.auctionID NOT IN ($this_buyer_auctions)
+                   AND '$current_time' > (SELECT startDate
+                                          FROM Auctions
+                                          WHERE auctionID = b.auctionID)
                    AND '$current_time' < (SELECT endDate
                                           FROM Auctions
                                           WHERE auctionID = b.auctionID)
