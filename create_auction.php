@@ -257,9 +257,12 @@ function minInput_onblur() {
       minIncrement = $('#minIncrement').val();
    }
    if ((ReservePrice - startingPrice) <= minIncrement)
-   {    
-      document.getElementById("minIncrementHelp").innerHTML="<span class='text-danger'>* Required.&nbsp</span><span class='bg-warning text-dark'>&nbspThis seems high compared to your reserve price.&nbsp</span>";
-   } 
+   {    if (ReservePrice == 0){
+    document.getElementById("minIncrementHelp").innerHTML="<span class='text-danger'>* Required.</span> The minimum amount one bidder must outbid another bidder by.";
+   }else{
+    document.getElementById("minIncrementHelp").innerHTML="<span class='text-danger'>* Required.&nbsp</span><span class='bg-warning text-dark'>&nbspThis seems high compared to your reserve price.&nbsp</span>";
+   }
+   }
    else
    {
       document.getElementById("minIncrementHelp").innerHTML="<span class='text-danger'>* Required.</span> The minimum amount one bidder must outbid another bidder by.";
