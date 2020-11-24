@@ -40,7 +40,7 @@
 			GROUP BY auctionID";
 
   // Get all the relevant summary information about the auction
-  $sql_main = "SELECT a.title, a.descript, a.startDate, a.endDate, a.startPrice, a.reservePrice, a.minIncrement, c.categoryName, s.username, s.sellerID, p.maxBid, p.numBids, w.watchers
+  $sql_main = "SELECT a.title, a.descript, a.startDate, a.endDate, a.startPrice, a.reservePrice, a.minIncrement, c.categoryName, s.username, s.sellerID, p.maxBid, p.numBids, IFNULL(w.watchers, 0) AS watchers
 			   FROM Auctions a
 			   LEFT JOIN Categories c ON a.categoryID = c.categoryID
 			   LEFT JOIN Sellers s ON a.sellerID = s.sellerID
@@ -205,6 +205,9 @@
 		<p class="lead">Starting price: £<?php echo(number_format($start_price, 2)) ?></p>
 		<p class="lead">Minimum increment: £<?php echo(number_format($min_increment, 2)) ?></p>
 		<p class="lead">Current price: £<?php echo(number_format($current_price, 2)) ?></p>
+		<?php if ($usertype == "seller" && $user_id == $seller_id && $reserve_price > $start_price): ?>
+			<p class="lead">Reserve price: £<?php echo(number_format($reserve_price, 2)) ?></p>
+		<?php endif ?>
 		<?php if ($start_price == $reserve_price): ?>
 			<p class="lead">This auction has no reserve price!</p>
 		<?php elseif ($current_price < $reserve_price): ?>
