@@ -177,11 +177,11 @@
         <hr>
         <div class="form-check">
           <input class="form-check-input" type="radio" value="endingSoonChecked" id="showEndDate1" name="checkedOrder[]" <?php echo $endingSoonChecked ?>>
-          <label class="form-check-label" for="showEndDate1">End date (soonest to latest)</label>
+          <label class="form-check-label" for="showEndDate1">End date (Soonest to Latest)</label>
         </div>
         <div class="form-check">
           <input class="form-check-input" type="radio" value="endingLaterChecked" id="showEndDate2" name="checkedOrder[]" <?php echo $endingLaterChecked ?>>
-          <label class="form-check-label" for="showEndDate2">End date (latest to soonest)</label>
+          <label class="form-check-label" for="showEndDate2">End date (Latest to Soonest)</label>
    
         </div>
         <button type="submit" class="btn btn-outline-primary" style="margin-left: 0.5%">Apply</button>
@@ -196,14 +196,14 @@
     <div id="productCards" class="row">
       <?php
       $sql_temp = "SELECT a.auctionID, s.username, a.title, a.endDate, c.categoryID, c.categoryName, MAX(b.bidAmount) AS YourHighestBid  
-			  FROM Auctions a 
-			  JOIN Bids b ON a.auctionID = b.auctionID 
-			  JOIN Categories c ON a.categoryID = c.categoryID
-			  JOIN Buyers b2 ON b2.buyerID = b.buyerID
-			  JOIN Sellers s ON s.sellerID = a.sellerID
-			  WHERE b.buyerID = '$buyer_id' AND b2.username = '$username' AND a.auctionID IN 
-			  (SELECT DISTINCT a.auctionID FROM Auctions a JOIN Bids b ON a.auctionID = b.auctionID WHERE b.buyerID = '$buyer_id')
-			  GROUP BY a.auctionID, s.username, a.title, a.endDate, c.categoryName";
+				   FROM Auctions a 
+				   JOIN Bids b ON a.auctionID = b.auctionID 
+				   JOIN Categories c ON a.categoryID = c.categoryID
+				   JOIN Buyers b2 ON b2.buyerID = b.buyerID
+				   JOIN Sellers s ON s.sellerID = a.sellerID
+				   WHERE b.buyerID = '$buyer_id' AND b2.username = '$username' AND a.auctionID IN 
+				   (SELECT DISTINCT a.auctionID FROM Auctions a JOIN Bids b ON a.auctionID = b.auctionID WHERE b.buyerID = '$buyer_id')
+				   GROUP BY a.auctionID, s.username, a.title, a.endDate, c.categoryName";
 	  $sql_temp2 = "SELECT a.auctionID, MAX(b.bidAmount) AS MaxBid
 					FROM Auctions a
 					JOIN Bids b ON a.auctionID = b.auctionID
@@ -286,15 +286,11 @@
 		$sellerUsername = $record['username'];
 		
 		// Determine the current state of the auction
-		$sql_2 = "SELECT a.auctionID,
-					b.bidAmount,
-					a.reservePrice,
-					b.buyerID,
-					bu.username
-				FROM Auctions a
-				JOIN Bids b ON a.auctionID = b.auctionID
-				JOIN Buyers bu ON b.buyerID = bu.buyerID
-				WHERE a.auctionID = '$productID' AND b.bidAmount = (SELECT MAX(bidAmount) FROM Bids WHERE auctionID = '$productID');";
+		$sql_2 = "SELECT a.auctionID, b.bidAmount, a.reservePrice, b.buyerID, bu.username
+				  FROM Auctions a
+				  JOIN Bids b ON a.auctionID = b.auctionID
+				  JOIN Buyers bu ON b.buyerID = bu.buyerID
+				  WHERE a.auctionID = '$productID' AND b.bidAmount = (SELECT MAX(bidAmount) FROM Bids WHERE auctionID = '$productID');";
 		$result = $conn->query($sql_2)->fetch_row() ?? false;
 		$usernameHighestBidder = $result[4];
 		// Check if the auction has ended
@@ -338,17 +334,17 @@
 			
 		// Get the user's bid history for this item and put it in a table
 		$sql_3 = "SELECT bidDate, username, bidAmount 
-				FROM Bids, Buyers 
-				WHERE bids.buyerID = buyers.buyerID AND auctionID = '$productID' and bids.buyerID = '$buyer_id' 
-				ORDER BY bidDate ";
+				  FROM Bids, Buyers 
+				  WHERE bids.buyerID = buyers.buyerID AND auctionID = '$productID' and bids.buyerID = '$buyer_id' 
+				  ORDER BY bidDate ";
 		$result = $conn->query($sql_3) ?? false;
 		  
 		$tableBids = '<table class="table table-hover collapse" id="bidsTable' . $productID  . '">
-				<thead class="thead-light">
-				<th>Bid Date</th>
-				<th>Username</th> 
-				<th>Bid Amount</th>
-				</thead>';
+						<thead class="thead-light">
+							<th>Bid Date</th>
+							<th>Username</th> 
+							<th>Bid Amount</th>
+						</thead>';
 		foreach($result as $val){
 			$tableBids .= '<tr>
 					<td>'.$val['bidDate'].'</td>

@@ -26,13 +26,28 @@
   // Get auctionID from the URL
   $auction_id = $_GET['auctionID'];
   
-  // Get relevant information about the auction
-  $sql_1 = "SELECT a.title, a.descript, a.startDate, a.endDate, a.startPrice, a.reservePrice, a.minIncrement, c.categoryName, s.username, s.sellerID
-			      FROM Auctions a
-		      	LEFT JOIN Categories c ON a.categoryID = c.categoryID
-		      	LEFT JOIN Sellers s ON a.sellerID = s.sellerID
-		      	WHERE auctionID = '$auction_id'; ";
-  $result = $conn->query($sql_1)->fetch_row() ?? false;
+  
+  // Get current price and number of bids
+  $sql_1 = "SELECT auctionID, max(bidAmount) AS maxBid, count(bidID) AS numBids 
+			FROM Bids 
+		    WHERE auctionID = '$auction_id'
+			GROUP BY auctionID";
+  
+  // Get number of watchers
+  $sql_2 = "SELECT auctionID, count(buyerID) AS watchers 
+			FROM Watching 
+		    WHERE auctionID = '$auction_id'
+			GROUP BY auctionID";
+
+  // Get all the relevant summary information about the auction
+  $sql_main = "SELECT a.title, a.descript, a.startDate, a.endDate, a.startPrice, a.reservePrice, a.minIncrement, c.categoryName, s.username, s.sellerID, p.maxBid, p.numBids, w.watchers
+			   FROM Auctions a
+			   LEFT JOIN Categories c ON a.categoryID = c.categoryID
+			   LEFT JOIN Sellers s ON a.sellerID = s.sellerID
+			   LEFT JOIN ($sql_1) p ON p.auctionID = a.auctionID
+			   LEFT JOIN ($sql_2) w ON w.auctionID = a.auctionID
+			   WHERE a.auctionID = '$auction_id'; ";
+  $result = $conn->query($sql_main)->fetch_row() ?? false;
   $title = $result[0];
   $description = $result[1];
   $start_time = new DateTime($result[2]);
@@ -43,6 +58,9 @@
   $category = $result[7];
   $seller_username = $result[8];
   $seller_id = $result[9];
+  $current_price = floatval($result[10]);
+  $num_bids = $result[11];
+  $num_watchers = $result[12];  
   
   // If the start date is in the future, only the seller of the item should be able to see it, otherwise redirect
   $now = new DateTime();
@@ -50,28 +68,20 @@
 	redirect_index();
   }
   
-  // Get current price and number of bids
-  $sql_2 = "SELECT max(bidAmount), count(bidID) 
-			      FROM Bids 
-		      	WHERE auctionID = '$auction_id';";
-  $result = $conn->query($sql_2)->fetch_row() ?? false;
-  $current_price = floatval($result[0]);
-  $num_bids = $result[1];
-    
   // Get bid history and put it in a table
   $sql_3 = "SELECT bidDate, username, bidAmount 
-		      	FROM Bids, Buyers 
-		      	WHERE bids.buyerID = buyers.buyerID AND auctionID = '$auction_id' 
-		      	ORDER BY bidDate;";
-  $result = $conn->query($sql_3) ?? false;
+			FROM Bids, Buyers 
+			WHERE bids.buyerID = buyers.buyerID AND auctionID = '$auction_id' 
+			ORDER BY bidDate;";
+  $result2 = $conn->query($sql_3) ?? false;
   
   $table = '<table class="table table-hover">
-          <thead class="thead-light">
-            <th>Bid Date</th>
-            <th>Username</th> 
-            <th>Bid Amount</th>
-          </thead>';
-  foreach($result as $val){
+			  <thead class="thead-light">
+				<th>Bid Date</th>
+				<th>Username</th> 
+				<th>Bid Amount</th>
+			  </thead>';
+  foreach($result2 as $val){
     $table .= '<tr>
                 <td>'.$val['bidDate'].'</td>
                 <td>'.$val['username'].'</td> 
@@ -79,22 +89,14 @@
               </tr>';
 	}
   $table .= '</table>'; 
-  
-  // Get number of watchers
-  $sql_4 = "SELECT count(buyerID) 
-			FROM Watching 
-		    WHERE auctionID = '$auction_id';";
-  $result = $conn->query($sql_4)->fetch_row() ?? false;
-  $num_watchers = $result[0];  
-  
-  
+    
   // If the user has a session, determine if the user is already watching this item.
   if ($has_session == true) {
-	$sql_5 = "SELECT count(buyerID) 
-			      FROM Watching 
-			      WHERE auctionID = '$auction_id' AND buyerID = '$user_id';";
-	$result = $conn->query($sql_5)->fetch_row() ?? false;
-	if ($result[0] == 1) {
+	$sql_4 = "SELECT count(buyerID) 
+			  FROM Watching 
+			  WHERE auctionID = '$auction_id' AND buyerID = '$user_id';";
+	$result3 = $conn->query($sql_4)->fetch_row() ?? false;
+	if ($result3[0] == 1) {
 		$watching = true;
 	} else {
 		$watching = false;

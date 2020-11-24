@@ -32,7 +32,7 @@
 			LEFT JOIN Sellers s ON s.sellerID = a.sellerID
 			LEFT JOIN ($sql_0) b1 ON b1.auctionID = a.auctionID
 			LEFT JOIN Buyers b2 ON b1.buyerID = b2.buyerID
-			WHERE a.endDate < NOW() AND TIMESTAMPDIFF(MINUTE, a.endDate, NOW()) < 10";
+			WHERE a.endDate < NOW() AND TIMESTAMPDIFF(MINUTE, a.endDate, NOW()) <= 10";
   $resultset = mysqli_query($conn, $sql_1) or die("database error:" . mysqli_error($conn));
   
   // If the query returned any results, proceed to send emails

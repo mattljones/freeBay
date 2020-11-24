@@ -173,11 +173,11 @@
         <hr>
         <div class="form-check">
           <input class="form-check-input" type="radio" value="endingSoonChecked" id="showEndDate1" name="checkedOrder[]" <?php echo $endingSoonChecked ?>>
-          <label class="form-check-label" for="showEndDate1">End date (soonest to latest)</label>
+          <label class="form-check-label" for="showEndDate1">End date (Soonest to Latest)</label>
         </div>
         <div class="form-check">
           <input class="form-check-input" type="radio" value="endingLaterChecked" id="showEndDate2" name="checkedOrder[]" <?php echo $endingLaterChecked ?>>
-          <label class="form-check-label" for="showEndDate2">End date (latest to soonest)</label>
+          <label class="form-check-label" for="showEndDate2">End date (Latest to Soonest)</label>
    
         </div>
         <button type="submit" class="btn btn-outline-primary" style="margin-left: 0.5%">Apply</button>
