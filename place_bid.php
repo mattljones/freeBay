@@ -120,10 +120,10 @@
 			 
 			  // Content
 			  // Get the auction URL so the user can directly access it from the email. Not sure if this will work on other computers.
-			  $auctionURL = 'http://' . htmlentities($_SERVER['HTTP_HOST']) . htmlentities(dirname($_SERVER['PHP_SELF'])) . '/listing.php?auctionID=' . $auction_id;
+			  //$auctionURL = 'http://' . htmlentities($_SERVER['HTTP_HOST']) . htmlentities(dirname($_SERVER['PHP_SELF'])) . '/listing.php?auctionID=' . $auction_id;
 			  $mail->isHTML(true);      // Set email format to HTML
 			  $mail->Subject = "$username, an auction from your watchlist has received a new bid!";
-			  $mail->Body    = "Auction <b><a href =$auctionURL>$auction_title</a></b> has received a bid of <b>£$bid_amount</b> by user <b>$buyer_username</b><br>$outbid"; 
+			  $mail->Body    = "Auction <b>$auction_title</b> has received a bid of <b>£$bid_amount</b> by user <b>$buyer_username</b><br>$outbid"; 
 			  $mail->send();
 
 		  } catch (Exception $e) {
@@ -144,7 +144,7 @@
     <h2 class="my-3"><?php echo("You successfully placed a bid of £" . number_format($bid_amount, 2) . "!") ?></h2>
 	<?php if (!$watching):?>
 		<div id="watch_nowatch">
-		<h5>You don't have this auction on your watchlist, would you like to add it?</h5>
+		<p>You don't have this auction on your watchlist, would you like to add it and receive bid notifications?</p>
 			<button type="button" class="btn btn-outline-secondary btn-sm" onclick="addToWatchlist()">+ Add to watchlist</button>	
 		</div>
 		<div id="watch_watching" style="display: none">

@@ -82,8 +82,8 @@
   
   // Get number of watchers
   $sql_4 = "SELECT count(buyerID) 
-			      FROM watching 
-		      	WHERE auctionID = '$auction_id';";
+			FROM Watching 
+		    WHERE auctionID = '$auction_id';";
   $result = $conn->query($sql_4)->fetch_row() ?? false;
   $num_watchers = $result[0];  
   
@@ -168,6 +168,7 @@
 	<?php if ($now >= $end_time && $current_price >= $reserve_price): ?>
 		<span class="badge badge-warning">This auction ended on <?php echo(date_format($end_time, 'j M H:i')) ?></span>
 		<hr class="rounded">
+		<p class="lead">Starting price: £<?php echo(number_format($start_price, 2)) ?></p>
 		<p class="lead">The item was sold for £<?php echo(number_format($current_price, 2)) ?>.</p>
 		<div class="card">
 			<h5 class="card-header">
@@ -183,6 +184,7 @@
 	<?php elseif ($now >= $end_time && $current_price < $reserve_price): ?>
 		<span class="badge badge-warning">This auction ended on <?php echo(date_format($end_time, 'j M H:i')) ?></span>
 		<hr class="rounded">
+		<p class="lead">Starting price: £<?php echo(number_format($start_price, 2)) ?></p>
 		<p class="lead">The reserve price was not reached and the item was not sold.</p>
 		<div class="card">
 			<h5 class="card-header">
