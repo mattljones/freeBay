@@ -232,6 +232,7 @@
     <hr>
     <div id="productCards" class="row">
       <?php
+      //This section displays the Auctions and their relevant information within a card
       $sqlMaxBid = "SELECT MAX(bidAmount) as maxBid, coalesce(count(DISTINCT buyerID), 0) as noOfBidders, auctionID, buyerID FROM Bids GROUP BY auctionID";
       $sqlMainMaxBid = "SELECT mainTable.*, coalesce(maxBid,mainTable.startPrice) as maxBid,  coalesce(noOfBidders,0) as noOfBidders, buyerID as maxBidderID FROM Auctions mainTable LEFT JOIN ($sqlMaxBid) maxBidTable ON mainTable.auctionID = maxBidTable.auctionID";
       $sqlWatchTable = "SELECT COUNT(auctionID) as noOfWatching, auctionID FROM `Watching` GROUP BY auctionID";
@@ -241,7 +242,6 @@
       if (isset($_POST['checkedCategories'])) {
         $sql .= " WHERE Categories.`categoryID` IN (";
         $categories = implode(',', $_POST['checkedCategories']);
-        #print_r($categories);
         $categories = "'" . str_replace(",", "','", $categories) . "'";
         $sql .= $categories;
         $sql .= ")";
@@ -252,6 +252,7 @@
       }
       $currentTime = new DateTime();
       $currentTime = $currentTime->format('Y-m-d H:i:s');
+      // This checks the logic of the ordering filters
       if (isset($_POST['checkedStatus'])) {
         if (in_array("checkActive", $_POST['checkedStatus'])) {
           $sql .= " AND '$currentTime' < endDate AND '$currentTime' > startDate";
@@ -330,10 +331,12 @@
           $checkNewListing = True;
           $badgeNewListing = '<span class="badge badge-secondary">New</span>';
         }
+        #Checks if it is a new Listing
         else {
           $checkNewListing = False;
           $badgeNewListing = '';
         }
+        #Calculates the remaning time of the Auction
         if ($now < $end_time) {
           $time_to_end = date_diff($now, $end_time);
           $productTimeLeft ='<span class="badge badge-success">Auction ends in ' . display_time_remaining($time_to_end) . '</span>' . " " . $badgeNewListing;
@@ -347,6 +350,7 @@
             $cardStatusFormat = "border-success mb-3";
           }
         }
+        #If the title or description is too long it will concat "..." at the end
         if (strlen($productTitle) > 79) {
           $titleSuffix = "...";
         }
@@ -360,11 +364,8 @@
           $descriptSuffix = "";
         }
 
-        #if ($productCurrentPrice == false) {
-        #  $productCurrentPrice = $productStartPrice;
-        #}
-
       ?>
+      <!-- An image can be added later on if that is required -->
         <div class="card <?php echo $cardStatusFormat ?>" style="width: 18rem; margin-left: 0.5%; margin-right: 0.5%; margin-top: 0.5%; margin-bottom: 0.5%;">
           <!--<img class="card-img-top" src="data:image/jpg;charset=utf8;base64,<?php echo base64_encode($record['image']); ?>" /> -->
           <div class="card-header">
@@ -377,10 +378,8 @@
 
           <div class="card-body">
             <h5 class="card-title"><?php echo substr($productTitle, 0, 80) . $titleSuffix?></h5>
-            <!--<p class="card-text">Category: <?php echo $productCategory ?></p>-->
             <p class="card-text"><?php echo substr($productDescript,0,300) . $descriptSuffix ?></p>
             <p class="card-text"><?php echo $productTimeLeft ?></p>
-            <!-- <a href="listing.php?auctionID=<?= $productID ?>" type="submit" class="btn btn-outline-primary text-center">View Item</a> -->
           </div>
           <div class="card-footer <?php echo $cardStatusFormat ?>">
             <div class="buy d-flex justify-content-between align-items-center">
@@ -388,7 +387,6 @@
                 <h5 class="mt-4">£<?= number_format($productCurrentPrice,2) ?></h5>
               </div>
               <a href="listing.php?auctionID=<?= $productID ?>" type="submit" class="btn btn-outline-primary text-center">View Item</a>
-              <!--<a href="#" class="btn btn-danger mt-3"><i class="fas fa-shopping-cart"></i> View Item</a>-->
             </div>
             <span class="text-info"><b>Seller: </b><?= $productSeller ?></span>
           </div>
@@ -400,6 +398,7 @@
 </div>
 
 <script>
+  // This function displays the message on the search result toastie at the top
   $(document).ready(function() {
     let numResults = <?php echo $num_rows ?>;
     numResults = parseInt(numResults)
@@ -414,12 +413,15 @@
     $("#messageToast").toast('show');
   });
 
+  //This checks the radio or checkboxes when someone searches
   function uncheckAll() {
     $("input[type='checkbox']:checked").prop("checked", false)
     $("input[type='radio']:checked").prop("checked", false)
   }
   $('#checkAll').on('click', uncheckAll)
 
+
+  //This function hides any cards if required
   $(document).ready(function() {
     $('#update_indication_id').on("change", function() {
       var value = $(this).val().toLowerCase();
@@ -429,6 +431,7 @@
     });
   });
 
+  //Helper formatting function to check which element is wider
   $.each($('*'), function() {
     if ($(this).width() > $('body').width()) {
       console.log("Wide Element: ", $(this), "Width: ",
