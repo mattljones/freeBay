@@ -41,7 +41,8 @@
 			GROUP BY auctionID";
 
   // Get all the relevant summary information about the auction
-  $sql_main = "SELECT a.title, a.descript, a.startDate, a.endDate, a.startPrice, a.reservePrice, a.minIncrement, c.categoryName, s.username, s.sellerID, p.maxBid, p.numBids, IFNULL(w.watchers, 0) AS watchers
+  $sql_main = "SELECT a.title, a.descript, a.startDate, a.endDate, a.startPrice, a.reservePrice, a.minIncrement, c.categoryName,
+			   s.username, s.sellerID, IFNULL(p.maxBid, 0) AS maxBid, IFNULL(p.numBids, 0) AS numBids, IFNULL(w.watchers, 0) AS watchers
 			   FROM Auctions a
 			   LEFT JOIN Categories c ON a.categoryID = c.categoryID
 			   LEFT JOIN Sellers s ON a.sellerID = s.sellerID
