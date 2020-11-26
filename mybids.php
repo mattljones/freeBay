@@ -335,7 +335,7 @@
 		// Get the user's bid history for this item and put it in a table
 		$sql_3 = "SELECT bidDate, username, bidAmount 
 				  FROM Bids, Buyers 
-				  WHERE bids.buyerID = buyers.buyerID AND auctionID = '$productID' and bids.buyerID = '$buyer_id' 
+				  WHERE Bids.buyerID = Buyers.buyerID AND auctionID = '$productID' and Bids.buyerID = '$buyer_id' 
 				  ORDER BY bidDate ";
 		$result = $conn->query($sql_3) ?? false;
 		  

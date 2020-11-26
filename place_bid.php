@@ -7,9 +7,9 @@
   use PHPMailer\PHPMailer\SMTP;
   use PHPMailer\PHPMailer\Exception;
   
-  require("PHPMailer\PHPMailer.php");
-  require("PHPMailer\SMTP.php");
-  require("PHPMailer\Exception.php");
+  require("PHPMailer/PHPMailer.php");
+  require("PHPMailer/SMTP.php");
+  require("PHPMailer/Exception.php");
   
   // Create connection
   require_once('private/database_credentials.php');
