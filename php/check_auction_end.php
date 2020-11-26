@@ -1,4 +1,3 @@
-<?php require("utilities.php")?>
 
 <?php
   // PHPMailer classes required to send emails
@@ -6,13 +5,13 @@
   use PHPMailer\PHPMailer\SMTP;
   use PHPMailer\PHPMailer\Exception;
   
-  require("PHPMailer\PHPMailer.php");
-  require("PHPMailer\SMTP.php");
-  require("PHPMailer\Exception.php");
+  require("..\PHPMailer\PHPMailer.php");
+  require("..\PHPMailer\SMTP.php");
+  require("..\PHPMailer\Exception.php");
       
   
   // Create connection
-  require_once('private/database_credentials.php');
+  require_once('../private/database_credentials.php');
   $conn = mysqli_connect(host, username, password, database);
   // Check connection
   if ($conn->connect_error) {
