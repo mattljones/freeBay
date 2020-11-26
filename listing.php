@@ -21,6 +21,7 @@
 	$usertype = $_SESSION['account_type'];
   } else {
     $has_session = false;
+	$usertype = "";
   }
 
   // Get auctionID from the URL

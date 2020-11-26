@@ -483,7 +483,7 @@ INSERT INTO BuyerTels (telNo, buyerID) VALUES (441632960947, 10);
 INSERT INTO Sellers (username, email, pass, firstName, familyName)
   VALUES ('rulesuper', 'carcus@optonline.net', '15feef93cbcf13e03ae482b0a1c99ac209c61fef82b0a1c99ac209c61fef', 'Jaxon', 'Daniels');
 INSERT INTO Sellers (username, email, pass, firstName, familyName)
-  VALUES ('coastfoking', 'mdielmann@optonline.net', 'c179147c8de2421e12d07bbe84d84883760568bf7bbe84d84883760568bf', 'Nojus', 'Grainger');
+  VALUES ('hibiscuspeel', 'mdielmann@optonline.net', 'c179147c8de2421e12d07bbe84d84883760568bf7bbe84d84883760568bf', 'Nojus', 'Grainger');
 INSERT INTO Sellers (username, email, pass, firstName, familyName)
   VALUES ('scourgetrotwood', 'mallanmba@optonline.net', 'beaf00795f5bb717e2d3168cf8e47db13b72fc99168cf8e47db13b72fc99', 'Shantelle', 'Stevenson');
 INSERT INTO Sellers (username, email, pass, firstName, familyName)
@@ -491,9 +491,9 @@ INSERT INTO Sellers (username, email, pass, firstName, familyName)
 INSERT INTO Sellers (username, email, pass, firstName, familyName)
   VALUES ('politicsduro', 'bester@gmail.com', '8033814191d11483fb9ba2eb314fac5bdcf1ef98a2eb314fac5bdcf1ef98', 'Herman', 'Gunn');
 INSERT INTO Sellers (username, email, pass, firstName, familyName)
-  VALUES ('sensualbeginner', 'msusa@gmail.com', 'f0df0f92ff7b707a78c75c8d3c15ff74ac1785105c8d3c15ff74ac178510', 'Olivia-Rose', 'Handley');
+  VALUES ('artfulnether', 'msusa@gmail.com', 'f0df0f92ff7b707a78c75c8d3c15ff74ac1785105c8d3c15ff74ac178510', 'Olivia-Rose', 'Handley');
 INSERT INTO Sellers (username, email, pass, firstName, familyName)
-  VALUES ('vardknobby', 'neuffer@me.com', 'e55a513215f5e8a4a5409beaac6ff5b01b22c0319beaac6ff5b01b22c031', 'Rachel', 'Rangel');
+  VALUES ('raftyportly', 'neuffer@me.com', 'e55a513215f5e8a4a5409beaac6ff5b01b22c0319beaac6ff5b01b22c031', 'Rachel', 'Rangel');
 INSERT INTO Sellers (username, email, pass, firstName, familyName)
   VALUES ('quoteelectronic', 'houle@sbcglobal.net', 'cd1cfc4d821a182c0793e50db2cd015deb922063e50db2cd015deb922063', 'Carwyn', 'Mendez');
 INSERT INTO Sellers (username, email, pass, firstName, familyName)
@@ -571,19 +571,19 @@ INSERT INTO Auctions (title, descript, createDate, startDate, endDate, startPric
 INSERT INTO Auctions (title, descript, createDate, startDate, endDate, startPrice, reservePrice, minIncrement, sellerID, categoryID)
   VALUES ('Yamaha 61 Key Electric Digital Piano Musical Beginner Electronic Keyboard Instrument', 
           'This electric digital piano has 61 key standard keys and 128 rhythms tones, which gives you wonderful sound quality. There are 5 functions especially tailored for beginners.',
-          '2020-11-03T13:13:24', '2020-11-03T13:13:24', '2020-11-13T13:13:24', 3.00, 5.00, 0.01, 4, 12);
+          '2020-11-03T13:13:24', '2020-11-03T13:13:24', '2020-11-30T13:13:24', 3.00, 5.00, 0.01, 4, 12);
 INSERT INTO Auctions (title, descript, createDate, startDate, endDate, startPrice, reservePrice, minIncrement, sellerID, categoryID)
   VALUES ('Skydiving experience for two', 
           'Go tandem skydiving in beautiful Gloucestershire and have an adrenaline rush like you''ve never experienced before! Only one jump per person per experience.',
-          '2020-11-02T18:00:30', '2020-11-02T18:00:30', '2020-11-14T18:00:30', 250.00, 250.00, 5.00, 5, 1);
+          '2020-11-02T18:00:30', '2020-11-02T18:00:30', '2020-11-30T18:00:30', 250.00, 250.00, 5.00, 5, 1);
 INSERT INTO Auctions (title, descript, createDate, startDate, endDate, startPrice, reservePrice, minIncrement, sellerID, categoryID)
   VALUES ('1000 Different Worldwide Stamps Collection', 
           'Some stamp packets may occasionally contain some CTO stamps if they have been issued like this by the relevant post office. In some cases larger stamp packets may contain variations of the same stamp, these are usually different perforations or watermarks.',
-          '2020-11-01T22:14:29', '2020-11-01T22:14:29', '2020-11-15T22:14:29', 10.00, 15.00, 1.00, 6, 2);
+          '2020-11-01T22:14:29', '2020-11-01T22:14:29', '2020-11-30T22:14:29', 10.00, 15.00, 1.00, 6, 2);
 INSERT INTO Auctions (title, descript, createDate, startDate, endDate, startPrice, reservePrice, minIncrement, sellerID, categoryID)
   VALUES ('Gold-coloured necklace 39cm', 
           'Pretty gold-coloured necklace 39cm (looks like gold but no mark as far as I can see). Condition is "Used" but good. Clasp in working order.',
-          '2020-10-29T18:10:11', '2020-11-01T18:10:11', '2020-11-16T18:10:11', 0.99, 0.99, 0.01, 7, 6);
+          '2020-10-29T18:10:11', '2020-11-01T18:10:11', '2020-11-30T18:10:11', 0.99, 0.99, 0.01, 7, 6);
 
 -- Bids x30         
 INSERT INTO Bids (bidDate, bidAmount, buyerID, auctionID) VALUES ('2020-11-05T13:24:13', 3.00, 2, 1);
