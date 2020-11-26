@@ -62,7 +62,7 @@ if ($type == "buyer") {
             echo '<h2 class="my-3">Registration unsuccessful :(</h2><p>There was an error adding your details to the database.</p><p>Click <a href="register.php">here</a> to return to the registration page and try again.</p>';
             mysqli_query($connection, "DELETE FROM Buyers WHERE username = '".$username."'");
             if (isset($_POST["chooseInputAddress"])) {
-                mysqli_query($connection, "DELETE FROM BuyerAddresses WHERE buyerID = (SELECT buyerID FROM Buyers WHERE username = '".$username."'");
+                mysqli_query($connection, "DELETE FROM BuyerAddresses WHERE buyerID = (SELECT buyerID FROM Buyers WHERE username = '".$username."')");
             }
             mysqli_close($connection);
         }
@@ -117,7 +117,7 @@ if ($type == "seller") {
             echo '<h2 class="my-3">Registration unsuccessful :(</h2><p>There was an error adding your details to the database.</p><p>Click <a href="register.php">here</a> to return to the registration page and try again.</p>';
             mysqli_query($connection, "DELETE FROM Sellers WHERE username = '".$username."'");
             if (isset($_POST["chooseInputAddress"])) {
-                mysqli_query($connection, "DELETE FROM SellerAddresses WHERE sellerID = (SELECT sellerID FROM Sellers WHERE username = '".$username."'");
+                mysqli_query($connection, "DELETE FROM SellerAddresses WHERE sellerID = (SELECT sellerID FROM Sellers WHERE username = '".$username."')");
             }
             mysqli_close($connection);
         }
