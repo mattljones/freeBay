@@ -233,8 +233,8 @@
     <div id="productCards" class="row">
       <?php
       //This section displays the Auctions and their relevant information within a card
-      $sqlMaxBid = "SELECT MAX(bidAmount) as maxBid, coalesce(count(DISTINCT buyerID), 0) as noOfBidders, auctionID, buyerID FROM Bids GROUP BY auctionID";
-      $sqlMainMaxBid = "SELECT mainTable.*, coalesce(maxBid,mainTable.startPrice) as maxBid,  coalesce(noOfBidders,0) as noOfBidders, buyerID as maxBidderID FROM Auctions mainTable LEFT JOIN ($sqlMaxBid) maxBidTable ON mainTable.auctionID = maxBidTable.auctionID";
+      $sqlMaxBid = "SELECT MAX(bidAmount) as maxBid, count(DISTINCT buyerID) as noOfBidders, auctionID FROM Bids GROUP BY auctionID";
+      $sqlMainMaxBid = "SELECT mainTable.*, coalesce(maxBid,mainTable.startPrice) as maxBid,  coalesce(noOfBidders,0) as noOfBidders FROM Auctions mainTable LEFT JOIN ($sqlMaxBid) maxBidTable ON mainTable.auctionID = maxBidTable.auctionID";
       $sqlWatchTable = "SELECT COUNT(auctionID) as noOfWatching, auctionID FROM `Watching` GROUP BY auctionID";
       $sqlMainMaxBidWatch = "SELECT mainTable.*, coalesce(noOfWatching,0) as noOfWatching FROM ($sqlMainMaxBid) mainTable LEFT JOIN ($sqlWatchTable) watchTable ON mainTable.auctionID = watchTable.auctionID";
       $sqlMainMaxBidWatchSeller = "SELECT mainTable.*, username as sellerUsername FROM ($sqlMainMaxBidWatch) mainTable INNER JOIN Sellers ON mainTable.sellerID = Sellers.sellerID";
@@ -305,10 +305,7 @@
       $resultset = mysqli_query($conn, $sql) or die("database error:" . mysqli_error($conn));
       $num_rows = mysqli_num_rows($resultset);
       while ($record = mysqli_fetch_assoc($resultset)) {
-        $productAuctionID = $record['auctionID'];;
-        $sql2 = "SELECT max(bidAmount) as currentPrice, count(bidID) FROM Bids WHERE auctionID = $productAuctionID ";
-        $sql3 = "SELECT count(auctionID) as noOfWatchers FROM Watching WHERE auctionID = $productAuctionID ";
-        $result = $conn->query($sql2)->fetch_assoc() ?? false;
+        $productAuctionID = $record['auctionID'];
         $productTitle = $record['title'];
         $productCategory = $record['categoryName'];
         $productDescript = $record['descript'];
