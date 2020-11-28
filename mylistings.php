@@ -26,7 +26,7 @@ $sellerID=$_SESSION['userID'];
       <!-- Filters that check the current status of the Auctions-->
       <h2>Status</h2>
       <?php
-      $activeChecked1 = "checked";
+      $activeChecked1 = "";
       $activeChecked2 = "";
       $activeChecked3 = "";
       $scheduledChecked = "";
