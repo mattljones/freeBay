@@ -221,8 +221,8 @@ $sellerID=$_SESSION['userID'];
     <hr>
     <div id="productCards" class="row">
       <?php
-      $sqlMaxBid = "SELECT IFNULL(MAX(bidAmount),0) as maxBid, coalesce(count(DISTINCT buyerID), 0) as noOfBidders, auctionID, buyerID FROM Bids GROUP BY auctionID";
-      $sqlMainMaxBid = "SELECT mainTable.*, coalesce(maxBid,0) as maxBid,  coalesce(noOfBidders,0) as noOfBidders, buyerID as maxBidderID FROM Auctions mainTable LEFT JOIN ($sqlMaxBid) maxBidTable ON mainTable.auctionID = maxBidTable.auctionID";
+      $sqlMaxBid = "SELECT IFNULL(MAX(bidAmount),0) as maxBid,count(DISTINCT buyerID) as noOfBidders,auctionID FROM Bids GROUP BY auctionID";
+      $sqlMainMaxBid = "SELECT mainTable.*, coalesce(maxBid,0) as maxBid,  coalesce(noOfBidders,0) as noOfBidders FROM Auctions mainTable LEFT JOIN ($sqlMaxBid) maxBidTable ON mainTable.auctionID = maxBidTable.auctionID";
       $sqlWatchTable = "SELECT COUNT(auctionID) as noOfWatching, auctionID FROM `Watching` GROUP BY auctionID";
       $sqlMainMaxBidWatch = "SELECT mainTable.*, coalesce(noOfWatching,0) as noOfWatching FROM ($sqlMainMaxBid) mainTable LEFT JOIN ($sqlWatchTable) watchTable ON mainTable.auctionID = watchTable.auctionID";
       $sqlMainMaxBidWatchSeller = "SELECT mainTable.*, username as sellerUsername FROM ($sqlMainMaxBidWatch) mainTable INNER JOIN Sellers ON mainTable.sellerID = Sellers.sellerID";
@@ -230,7 +230,6 @@ $sellerID=$_SESSION['userID'];
       if (isset($_POST['checkedCategories'])) {
         $sql .= " WHERE Categories.`categoryID` IN (";
         $categories = implode(',', $_POST['checkedCategories']);
-        #print_r($categories);
         $categories = "'" . str_replace(",", "','", $categories) . "'";
         $sql .= $categories;
         $sql .= ") AND sellerID=$sellerID";
@@ -307,9 +306,7 @@ $sellerID=$_SESSION['userID'];
       $num_rows = mysqli_num_rows($resultset);
       while ($record = mysqli_fetch_assoc($resultset)) {
         $productAuctionID = $record['auctionID'];;
-        $sql2 = "SELECT max(bidAmount) as currentPrice, count(bidID) FROM Bids WHERE auctionID = $productAuctionID ";
-        $sql3 = "SELECT count(auctionID) as noOfWatchers FROM Watching WHERE auctionID = $productAuctionID ";
-        $result = $conn->query($sql2)->fetch_assoc() ?? false;
+       
         $productTitle = $record['title'];
         $productCategory = $record['categoryName'];
         $productDescript = $record['descript'];
@@ -319,7 +316,7 @@ $sellerID=$_SESSION['userID'];
         $productWatchers = $record['noOfWatching'];
         $productSeller = $record['sellerUsername'];
 
-        #$result3 = $conn->query($sql3)->fetch_assoc() ?? false;
+        
         if($record['maxBid']==0){
           $productCurrentPrice = $record['startPrice'];
         }else{
