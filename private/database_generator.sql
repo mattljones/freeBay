@@ -531,11 +531,11 @@ INSERT INTO Auctions (title, descript, createDate, startDate, endDate, startPric
 INSERT INTO Auctions (title, descript, createDate, startDate, endDate, startPrice, reservePrice, minIncrement, sellerID, categoryID)
   VALUES ('1080p 42 inch Samsung flat screen TV. Top of the range and brand new!', 
           'Super high quality display great for watching sport and movies. Really vivid colours and 5 star reviews all across the web. Get yours now!',
-          '2020-11-04T17:36:01', '2020-11-04T17:36:01', '2020-11-05T17:36:01', 150.00, 300.00, 10.00, 3, 3);
+          '2020-11-04T17:36:01', '2020-11-04T17:36:01', '2020-12-05T17:36:01', 150.00, 300.00, 10.00, 3, 3);
 INSERT INTO Auctions (title, descript, createDate, startDate, endDate, startPrice, reservePrice, minIncrement, sellerID, categoryID)
   VALUES ('Men''s Barbour Jacket with some small scratches. Size Large.', 
           'Classic Barbour jacket, ideal for your loved one. Selling as I''m moving abroad to a tropical paradise. Minor wear and tear both nothing too serious.',
-          '2020-11-03T09:31:45', '2020-11-03T09:31:45', '2020-11-04T09:31:45', 40.00, 40.00, 1.00, 4, 4);
+          '2020-11-03T09:31:45', '2020-11-03T09:31:45', '2020-12-14T09:31:45', 40.00, 40.00, 1.00, 4, 4);
 INSERT INTO Auctions (title, descript, createDate, startDate, endDate, startPrice, reservePrice, minIncrement, sellerID, categoryID)
   VALUES ('Ladies Peep toe Stiletto Shoes Evening High Heels Ankle strap Sandals size 3-8', 
           'Approx heel height of 4.5" and platform height of 1". Faux suede material and true to size. Brand new and in the box.',
@@ -559,7 +559,7 @@ INSERT INTO Auctions (title, descript, createDate, startDate, endDate, startPric
 INSERT INTO Auctions (title, descript, createDate, startDate, endDate, startPrice, reservePrice, minIncrement, sellerID, categoryID)
   VALUES ('BRAND NEW! Database Systems; A Practical Approach to Design, Implementation, and Management (6ed)', 
           'Recommended for any serious student of databases. 1400 (!) pages of great information present in a coherent and easy-to-understand way.',
-          '2020-11-06T12:00:00', '2020-11-06T12:00:00', '2020-11-10T12:00:00', 100.00, 110.00, 1.00, 2, 10);
+          '2020-11-06T12:00:00', '2020-11-06T12:00:00', '2020-12-10T12:00:00', 100.00, 110.00, 1.00, 2, 10);
 INSERT INTO Auctions (title, descript, createDate, startDate, endDate, startPrice, reservePrice, minIncrement, sellerID, categoryID)
   VALUES ('DLux Vitamin D daily oral spray', 
           'Great for use in the winter months when you aren''t getting enough sun. Especially important at the moment..!',
